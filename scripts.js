@@ -18,7 +18,7 @@ var options = {
             to: {enabled: false}
         }
     },
-    physics: { enabled: true }
+    physics: { enabled: true } ,
 };
 var network = new vis.Network(container, data, options);
 
@@ -39,11 +39,11 @@ function addNode() {
         return;
     }
 
-    nodes.add({ id: Number(label), label: label}); // set color inside this
+    nodes.add({ id: Number(label), label: label}, ); // set color inside this
     document.getElementById('node-label').value = '';
     node_count += 1;
     document.getElementById('node-count').textContent = node_count;
-    console.log(nodes.get())
+    // console.log(nodes.get())
     calculateDegrees()
 }
 
