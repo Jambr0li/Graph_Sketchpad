@@ -43,6 +43,7 @@ function addNode() {
     node_count += 1;
     document.getElementById('node-count').textContent = node_count;
     // console.log(nodes.get())
+    calculateDegrees()
 }
 
 function deleteNode() {
@@ -75,6 +76,7 @@ function deleteNode() {
         }
     }
     document.getElementById('edge-count').textContent = edge_count;
+    calculateDegrees()
 }
 
 function setNodeColor() {
@@ -130,6 +132,7 @@ function addEdge() {
     document.getElementById('edge-to').value = '';
     edge_count += 1;
     document.getElementById('edge-count').textContent = edge_count;
+    calculateDegrees()
 }
 
 function deleteEdge() {
@@ -146,4 +149,42 @@ function deleteEdge() {
     edge_count -= 1;
     document.getElementById('edge-count').textContent = edge_count;
     document.getElementById('edge-id').value = ''
+    calculateDegrees()
+}
+
+function calculateDegrees() {
+    const degreeCount = {}
+    for (const node of nodes.get()){ // for each node
+        degreeCount[node.id] = 0; // initialize degree count to 0
+        for (const edge of edges.get()) {
+            if (edge.to === node.id || edge.from === node.id){
+                degreeCount[node.id] += 1
+            }
+        }
+    }
+
+    let html = `
+      <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
+        <thead>
+          <tr style="background: #f5f5f5;">
+            <th style="border: 1px solid #ccc; padding: 8px;">Node ID</th>
+            <th style="border: 1px solid #ccc; padding: 8px;">Degree</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    for (const nodeId in degreeCount) {
+      html += `
+          <tr>
+            <td style="border: 1px solid #ccc; padding: 8px;">${nodeId}</td>
+            <td style="border: 1px solid #ccc; padding: 8px;">${degreeCount[nodeId]}</td>
+          </tr>
+      `;
+    }
+
+    html += `</tbody></table>`;
+
+    // Insert the entire table in one go
+    document.getElementById('node-degrees').innerHTML = html;
 }
