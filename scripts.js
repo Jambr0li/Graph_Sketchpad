@@ -24,6 +24,7 @@ var network = new vis.Network(container, data, options);
 
 function addNode() {
     var label = document.getElementById('node-label').value;
+    console.log(label);
     if (label.trim() === '') {
         alert('Please enter a label for the node.');
         return;
@@ -39,7 +40,14 @@ function addNode() {
         return;
     }
 
-    nodes.add({ id: Number(label), label: label}, ); // set color inside this
+    // ensure the new nodes appear in a reasonable place
+    var viewPosition = network.getViewPosition();
+    var scale = network.getScale();
+    var offset = 400 / scale;
+    var x = viewPosition.x + Math.random() * offset - offset / 2;
+    var y = viewPosition.y + Math.random() * offset - offset / 2;
+
+    nodes.add({ id: Number(label), label: label, x: x, y: y }, ); // set color inside this
     document.getElementById('node-label').value = '';
     node_count += 1;
     document.getElementById('node-count').textContent = node_count;
