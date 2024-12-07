@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interactive Graph Visualization</title>
+  <script type="text/javascript" src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+  <!-- Bootstrap CSS -->
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+    rel="stylesheet" 
+    integrity="sha384-9ndCyUa1DmL9gDrf7AWgkKV0tTT2w6N6sCohsZNbZ4IcM4K/j1TdEr1giBvMU96K" 
+    crossorigin="anonymous"
+  >
+  
+  <link href="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="content">
+    <div class="network-content">
+      <h1>Interactive Graph Visualization</h1>
+      <div id="network"></div>
+    </div>
+
+    <div class="graph-info">
+      <p class="graph-stat">Number of vertices: <span id="node-count">0</span></p>
+      <p class="graph-stat">Number of edges: <span id="edge-count">0</span></p>
+      <button onclick="toggleDirection()">Toggle Edge Direction</button>
+    </div>
+
+    <div id="controls">
+      <!-- Adding Nodes -->
+      <div class="add-node-container graph-logic">
+        <h3>Add/Delete Node</h3>
+        <label>Label:</label>
+        <input type="text" id="node-label" placeholder="Enter node label" />
+        <button onclick="addNode()">Add Node</button>
+        <button onclick="deleteNode()">Delete Node</button>
+      </div>
+
+      <!-- Set Node Color-->
+      <div class="set-node-color-container graph-logic">
+        <h3>Change Node Color</h3>
+        <label>Label:</label>
+        <input type="text" id="node-color-label" placeholder="Enter node label" />
+        <label>Color:</label>
+        <input type="text" id="node-color-selection" placeholder="(#000000 or 'red')" />
+        <button onclick="setNodeColor()">Change Color</button>
+      </div>
+
+      <!-- Adding Edges -->
+      <div class="add-edge-container graph-logic">
+        <h3>Add/Delete Edge</h3>
+        <label for="edge-from">From Node ID:</label>
+        <input type="number" id="edge-from" placeholder="From ID" />
+        <label for="edge-to">To Node ID:</label>
+        <input type="number" id="edge-to" placeholder="To ID" />
+        <button onclick="addEdge()">Add Edge</button><br>
+        <label>Edge ID:</label>
+        <input type="number" id="edge-id" placeholder="Edge ID" />
+        <button onclick="deleteEdge()">Delete Edge</button>
+      </div>
+    </div>
+  </div>
+
+   <script src="scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+#network {
+    width: 800px;
+    height: 600px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+}
+#controls {
+    border-style: solid;
+    border-radius: 5px;
+    margin-top: 20px;
+    padding-bottom: 20px;
+    width: 800px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.network-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.graph-logic {
+    padding-left: 20px;
+}
+
+.graph-info {
+    display: flex;
+}
+
+.graph-stat {
+    margin: 5px;
+}
