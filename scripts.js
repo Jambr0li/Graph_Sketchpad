@@ -17,7 +17,8 @@ var options = {
         arrows: {
             to: {enabled: false}
         }
-    }
+    },
+    physics: { enabled: true }
 };
 var network = new vis.Network(container, data, options);
 
@@ -42,7 +43,7 @@ function addNode() {
     document.getElementById('node-label').value = '';
     node_count += 1;
     document.getElementById('node-count').textContent = node_count;
-    // console.log(nodes.get())
+    console.log(nodes.get())
     calculateDegrees()
 }
 
@@ -112,6 +113,12 @@ function setNodeColor() {
 function toggleDirection() {
     var currentState = options.edges.arrows.to.enabled;
     options.edges.arrows.to.enabled = !currentState;
+    network.setOptions(options);
+}
+
+function togglePhysics() {
+    var currentState = options.physics.enabled;
+    options.physics.enabled = !currentState;
     network.setOptions(options);
 }
 
