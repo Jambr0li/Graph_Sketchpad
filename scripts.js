@@ -207,6 +207,9 @@ function calculateDegrees() {
     document.getElementById('node-degrees').innerHTML = html;
 }
 
+function createAdjacencyMatrix(){
+}
+
 // returns an array of components (1 component = array of connected node IDs)
 function getComponents() { 
     var allNodes = nodes.get().map(n => n.id)

@@ -1,12 +1,55 @@
+body {
+    background-color: #EAE0D5;
+    color: #0A0908;
+}
+
+button {
+    padding: 5px 10px 5px 10px;
+    border-radius: 8px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #5E503F;
+    background-color: #EAE0D5;
+}
+
+input {
+    border-radius: 3px;
+    border-width: 1px;
+    height: 1.3rem;
+}
+
+input:focus {
+    outline: 2px solid #22333B;
+    background-color: #edebe9;
+}
+
+button:hover {
+    transition: 300ms;
+    scale: 1.05;
+    background-color: #22333B;
+    color: #EAE0D5;
+    cursor: pointer;
+}
+
+.title {
+    font-family: "Inknut Antiqua", serif;
+    font-weight: 900;
+    font-style: normal;
+}
+
 #network {
     width: 800px;
     height: 600px;
-    border: 1px solid lightgray;
-    border-radius: 5px;
+    border: 1px solid #22333B;
+    border-radius: 25px;
+    background-color: white;
+    margin-bottom: 10px;
 }
 #controls {
     border-style: solid;
-    border-radius: 5px;
+    border-color: #22333B;
+    background-color: #C6AC8F;
+    border-radius: 25px;
     margin-top: 20px;
     padding-bottom: 20px;
     width: 800px;
