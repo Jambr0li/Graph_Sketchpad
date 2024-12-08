@@ -44,7 +44,7 @@
       <div class="add-node-container graph-logic">
         <h3>Add/Delete Node</h3>
         <label>Label:</label>
-        <input type="text" id="node-label" placeholder="Enter node label" />
+        <input type="number" id="node-label" placeholder="Enter node label" />
         <button onclick="addNode()">Add Node</button>
         <button onclick="deleteNode()">Delete Node</button>
       </div>
@@ -62,17 +62,37 @@
       <!-- Adding Edges -->
       <div class="add-edge-container graph-logic">
         <h3>Add/Delete Edge</h3>
-        <label for="edge-from">From Node ID:</label>
-        <input type="number" id="edge-from" placeholder="From ID" />
-        <label for="edge-to">To Node ID:</label>
-        <input type="number" id="edge-to" placeholder="To ID" />
+        <label for="edge-from">From</label>
+        <input type="number" id="edge-from" placeholder="Node ID" />
+        <label for="edge-to">To</label>
+        <input type="number" id="edge-to" placeholder="Node ID" />
         <button onclick="addEdge()">Add Edge</button><br>
         <label>Edge ID:</label>
         <input type="number" id="edge-id" placeholder="Edge ID" />
         <button onclick="deleteEdge()">Delete Edge</button>
       </div>
+
+      <!-- Dijkstra's Input -->
+      <div class="add-edge-container graph-logic">
+        <h3>Find Shortest Path (Djikstra's)</h3>
+        <label>From</label>
+        <input type="number" id="node-from-dij" placeholder="Node ID" />
+        <label>To</label>
+        <input type="number" id="node-to-dij" placeholder="Node ID" />
+        <button onclick="dijkstra()">Find Path</button><br>
+      </div>
+
     </div>
-    <div id="node-degrees"></div>
+    <div class="table-data">
+      <div class="node-degree-container">
+        <h3 id="node-degree-title"></h3>
+        <div id="node-degrees"></div>
+      </div>
+      <div class="adj-matrix-container">
+        <h3 id="adj-matrix-title"></h3>
+        <div id="adj-matrix"></div>
+      </div>
+    </div>
   </div>
   <script src="scripts.js"></script>
 </body>

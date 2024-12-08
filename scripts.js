@@ -32,6 +32,7 @@ function updateGraphInfo() {
     var components = getComponents();
     document.getElementById("component-count").textContent = components.length;
     calculateDegrees()
+    createAdjacencyMatrix()
 }
 
 function addNode() {
@@ -171,7 +172,7 @@ function deleteEdge() {
     edge_count -= 1;
     document.getElementById('edge-count').textContent = edge_count;
     document.getElementById('edge-id').value = ''
-    calculateDegrees()
+    updateGraphInfo();
 }
 
 function calculateDegrees() {
@@ -208,9 +209,99 @@ function calculateDegrees() {
     html += `</tbody></table>`;
 
     // Insert the entire table in one go
+    document.getElementById('node-degree-title').textContent = "Node Degrees"
+    document.getElementById('adj-matrix-title').textContent = "Adjacency Matrix"
     document.getElementById('node-degrees').innerHTML = html;
 }
 
+function createAdjacencyMatrix(){
+    // Create a dictionary of what nodes are connected
+    // {
+    //  1 -> 2,3,4
+    //  2 -> 4
+    // }
+
+    const length = nodes.get().length;
+
+    const node_ID_to_index = {};
+    const index_to_node_ID= {};
+    nodes.get().forEach((node,index) => {
+        node_ID_to_index[node.id] = index;
+        index_to_node_ID[index] = node.id;
+    });
+
+    // Then create an adjacency matrix using this information.
+
+    var adj_obj = {}
+    for (const node of nodes.get()) {
+        adj_obj[node.id] = new Set();
+    }
+    for (const edge of edges.get()) {
+        adj_obj[edge.to].add(edge.from);
+        adj_obj[edge.from].add(edge.to);
+    }
+
+    // construct the adj matrix
+    var adj_matrix = Array.from({ length: length }, () => Array(length).fill(0));
+    for (const node of nodes.get()) {
+        const fromIndex = node_ID_to_index[node.id]
+        for (const connection of adj_obj[node.id]){
+            const toIndex = node_ID_to_index[connection]
+            adj_matrix[fromIndex][toIndex] = 1;
+        }
+    }
+
+    let html = `
+      <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
+        <thead>
+          <tr style="background: #f5f5f5;">
+            <th style="border: 1px solid #ccc; padding: 8px;"></th>`
+    
+    adj_matrix.forEach((arr, index) => { // add all the top headers
+        html += `<th style="border: 1px solid #ccc; padding: 8px;">${index_to_node_ID[index]}</th>`
+    })
+    html += `  </tr>
+             </thead>
+             <tbody>`
+    adj_matrix.forEach((arr, index) => {
+        html += `</tr>
+                    <th style="border: 1px solid #ccc; padding: 8px; background: #f5f5f5;">${index_to_node_ID[index]}</th>`
+        arr.forEach( num => {
+            html += `<td style="border: 1px solid #ccc; padding: 8px;">${num}</td>`
+
+        })
+        html += `</tr>`
+    })
+
+    html += `</tbody></table>`;
+    document.getElementById('adj-matrix').innerHTML = html;
+
+
+
+        //   loop through through and add each index
+
+    //         <th style="border: 1px solid #ccc; padding: 8px;">Node ID</th>
+    //         <th style="border: 1px solid #ccc; padding: 8px;">Degree</th>
+    //       </tr>
+    //     </thead>
+    //     <tbody>
+    // `;
+
+    console.log(adj_obj);
+    console.log(adj_matrix);
+    adj_matrix.forEach((arr, index) => {
+        console.log(index_to_node_ID[index], arr)
+        // arr.forEach(num => {
+        //     console.log(num);
+        // })
+    })
+}
+
+function dijkstra() {
+    const fromNode = document.getElementById('node-from-dij').value;
+    const toNode = document.getElementById('node-to-dij').value;
+    console.log(fromNode, toNode)
+}
 // returns an array of components (1 component = array of connected node IDs)
 function getComponents() { 
     var allNodes = nodes.get().map(n => n.id)
@@ -342,8 +433,5 @@ function toggleBridges() {
             hover: nonBridgeColor
         });
     }
-}
-
-function createAdjacencyMatrix(){
 }
 

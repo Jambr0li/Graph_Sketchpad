@@ -74,6 +74,7 @@ button:hover {
 
 .graph-logic {
     padding-left: 20px;
+    margin-top: 1rem;
 }
 
 .graph-info {
@@ -82,4 +83,11 @@ button:hover {
 
 .graph-stat {
     margin: 5px;
+}
+
+.table-data {
+    margin-top: 10px;
+    display: flex;
+    width: 800px;
+    justify-content: space-between;
 }
