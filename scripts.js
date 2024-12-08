@@ -203,3 +203,6 @@ function calculateDegrees() {
     // Insert the entire table in one go
     document.getElementById('node-degrees').innerHTML = html;
 }
+
+function createAdjacencyMatrix(){
+}
