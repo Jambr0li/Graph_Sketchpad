@@ -33,6 +33,11 @@ function updateGraphInfo() {
     document.getElementById("component-count").textContent = components.length;
     calculateDegrees()
     createAdjacencyMatrix()
+    var isBipartiteText = document.getElementById("is-bipartite");
+    if (isGraphBipartite())
+        isBipartiteText.textContent = "Yes";
+    else 
+        isBipartiteText.textContent = "No";
 }
 
 function addNode() {
@@ -130,6 +135,7 @@ function toggleDirection() {
     var currentState = options.edges.arrows.to.enabled;
     options.edges.arrows.to.enabled = !currentState;
     network.setOptions(options);
+    updateGraphInfo();
 }
 
 function togglePhysics() {
@@ -276,25 +282,21 @@ function createAdjacencyMatrix(){
     html += `</tbody></table>`;
     document.getElementById('adj-matrix').innerHTML = html;
 
-
-
-        //   loop through through and add each index
-
+    //   loop through through and add each index
     //         <th style="border: 1px solid #ccc; padding: 8px;">Node ID</th>
     //         <th style="border: 1px solid #ccc; padding: 8px;">Degree</th>
     //       </tr>
     //     </thead>
     //     <tbody>
     // `;
-
-    console.log(adj_obj);
-    console.log(adj_matrix);
-    adj_matrix.forEach((arr, index) => {
-        console.log(index_to_node_ID[index], arr)
+    // console.log(adj_obj);
+    // console.log(adj_matrix);
+    //adj_matrix.forEach((arr, index) => {
+        // console.log(index_to_node_ID[index], arr)
         // arr.forEach(num => {
         //     console.log(num);
         // })
-    })
+    //})
 }
 
 function dijkstra() {
@@ -435,3 +437,49 @@ function toggleBridges() {
     }
 }
 
+function getDirectedNeighbors(nodeId, direction) {
+    const connectedEdges = network.getConnectedEdges(nodeId); 
+    const neighbors = [];
+
+    connectedEdges.forEach(edgeId => {
+        const edge = edges.get(edgeId); 
+        if (direction === 'outgoing' && edge.from === nodeId) {
+            neighbors.push(edge.to);
+        } else if (direction === 'incoming' && edge.to === nodeId) {
+            neighbors.push(edge.from);
+        }
+    });
+
+    return neighbors;
+}
+
+function isComponentBipartite(component) {
+    colors = {};
+    toVisit = [component[0]];
+    colors[component[0]] = 0;
+
+    var getNeighbors = (options.edges.arrows.to.enabled) 
+                    ? (node) => getDirectedNeighbors(node, "outgoing")
+                    : (node) => network.getConnectedNodes(node)
+
+    while (toVisit.length > 0) {
+        var curNode = toVisit.shift();
+        for (var n of getNeighbors(curNode)) {
+            if (!(n in colors)) {
+                colors[n] = 1 - colors[curNode];
+                toVisit.push(n);
+            }
+            else if (colors[n] == colors[curNode]) {
+                return false;
+            }
+        }
+    }
+    
+    console.log("colors = ", colors);
+
+    return true;
+}
+
+function isGraphBipartite() {
+    return getComponents().every(isComponentBipartite);
+}
