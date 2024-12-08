@@ -10,7 +10,9 @@
     integrity="sha384-9ndCyUa1DmL9gDrf7AWgkKV0tTT2w6N6sCohsZNbZ4IcM4K/j1TdEr1giBvMU96K" 
     crossorigin="anonymous"
   >
-  
+  <!-- hull library -->
+  <script src="https://cdn.jsdelivr.net/npm/hull.js@1.0.6/dist/hull.js"></script>
+
   <link href="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.css" rel="stylesheet" type="text/css" />
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -21,14 +23,17 @@
       <div id="network"></div>
     </div>
 
+    <div>
+      <button onclick="toggleDirection()">Toggle Edge Direction</button>
+      <button onclick="togglePhysics()">Toggle Physics</button>
+      <button onclick="showComponents()">Show Components</button>
+    </div>
+
     <div class="graph-info">
       <p class="graph-stat">Number of vertices: <span id="node-count">0</span></p>
       <p class="graph-stat">Number of edges: <span id="edge-count">0</span></p>
-      <button onclick="toggleDirection()">Toggle Edge Direction</button>
-      <button onclick="togglePhysics()">Toggle Physics</button>
+      <p class="graph-stat">Number of components: <span id="component-count">0</span></p>
     </div>
-
-    <div id="controls-other"></div>
 
     <div id="controls">
       <!-- Adding Nodes -->

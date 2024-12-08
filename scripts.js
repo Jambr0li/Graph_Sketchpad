@@ -7,6 +7,7 @@ var data = {
 var node_count = 0;
 var edge_count = 0;
 var edge_id = 0;
+var componentsShowed = true;
 
 var container = document.getElementById('network');
 var options = {
@@ -22,9 +23,16 @@ var options = {
 };
 var network = new vis.Network(container, data, options);
 
+function updateGraphInfo() {
+    document.getElementById('node-count').textContent = node_count;
+    document.getElementById('edge-count').textContent = edge_count;
+    var components = getComponents();
+    document.getElementById("component-count").textContent = components.length;
+    calculateDegrees()
+}
+
 function addNode() {
     var label = document.getElementById('node-label').value;
-    console.log(label);
     if (label.trim() === '') {
         alert('Please enter a label for the node.');
         return;
@@ -50,9 +58,7 @@ function addNode() {
     nodes.add({ id: Number(label), label: label, x: x, y: y }, ); // set color inside this
     document.getElementById('node-label').value = '';
     node_count += 1;
-    document.getElementById('node-count').textContent = node_count;
-    // console.log(nodes.get())
-    calculateDegrees()
+    updateGraphInfo();
 }
 
 function deleteNode() {
@@ -73,9 +79,8 @@ function deleteNode() {
     }
 
     nodes.remove({ id: Number(label), label: label});
-    document.getElementById('node-label').value = '';
     node_count -= 1;
-    document.getElementById('node-count').textContent = node_count;
+    document.getElementById('node-label').value = '';
 
     // Check if node being deleted has an edge attatched to it.
     for (const edge of edges.get()) {
@@ -84,8 +89,7 @@ function deleteNode() {
             edge_count -= 1;
         }
     }
-    document.getElementById('edge-count').textContent = edge_count;
-    calculateDegrees()
+    updateGraphInfo();
 }
 
 function setNodeColor() {
@@ -146,8 +150,7 @@ function addEdge() {
     document.getElementById('edge-from').value = '';
     document.getElementById('edge-to').value = '';
     edge_count += 1;
-    document.getElementById('edge-count').textContent = edge_count;
-    calculateDegrees()
+    updateGraphInfo();
 }
 
 function deleteEdge() {
@@ -202,4 +205,91 @@ function calculateDegrees() {
 
     // Insert the entire table in one go
     document.getElementById('node-degrees').innerHTML = html;
+}
+
+// returns an array of components (1 component = array of connected node IDs)
+function getComponents() { 
+    var allNodes = nodes.get().map(n => n.id)
+    var components = [];
+    while(allNodes.length > 0) {
+        var curComponent = [];
+        var toVisit = [allNodes.pop()];
+        while (toVisit.length > 0) {
+            var curNode = toVisit.pop();
+            if (curComponent.includes(curNode)) continue;
+            toVisit = toVisit.concat(network.getConnectedNodes(curNode));
+            curComponent.push(curNode);
+        }
+        allNodes = allNodes.filter(n => !curComponent.includes(n));
+        components.push(curComponent);
+    }
+    return components;
+}
+
+function getSeededColor(seed, opacity=1) {
+    function seededRandom() {
+        const m = 0x80000000;  // 2^31
+        const a = 1664525;
+        const c = 1013904223;
+
+        seed = (a * seed + c) % m;
+        return seed / m;
+    }
+
+    const r = Math.floor(seededRandom() * 256);
+    const g = Math.floor(seededRandom() * 256);
+    const b = Math.floor(seededRandom() * 256);
+
+    return `rgb(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+function generateCircle(center, radius, numPoints) {
+    const points = [];
+    const angleStep = (2 * Math.PI) / numPoints;
+
+    for (let i = 0; i < numPoints; i++) {
+        const angle = i * angleStep;
+        const x = center.x + radius * Math.cos(angle);
+        const y = center.y + radius * Math.sin(angle);
+        points.push({ x, y });
+    }
+
+    return points;
+}
+
+function drawComponents(ctx) {
+    const concavity = 1000;
+    const radius = 30;
+    const numPoints = 100;
+    var components = getComponents();
+    for (var nodeIDs of components) {
+        var positions = network.getPositions(nodeIDs);
+        var points = Object.values(positions)
+        var circlePoints = [];
+        for (var p of points) {
+            circlePoints = circlePoints.concat(generateCircle(p, radius, numPoints)); 
+        }
+        const hullPoints = hull(circlePoints.map(p => [p.x,p.y]), concavity);
+
+        ctx.beginPath();
+        ctx.moveTo(hullPoints[0][0], hullPoints[0][1]);
+        for (let i = 1; i < hullPoints.length; i++) {
+            ctx.lineTo(hullPoints[i][0], hullPoints[i][1]);
+        }
+        ctx.closePath();
+        ctx.fillStyle = getSeededColor(nodeIDs[0], 0.3);
+        ctx.fill();
+    }
+}
+
+function showComponents() {
+    if (componentsShowed) {
+        network.on("beforeDrawing", drawComponents);
+        componentsShowed = false;
+    }
+    else {
+        network.off("beforeDrawing", drawComponents);
+        componentsShowed = true;
+    }
+    network.redraw();
 }
