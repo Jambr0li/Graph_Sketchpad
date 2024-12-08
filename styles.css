@@ -41,6 +41,7 @@ button:hover {
 }
 
 .title {
+    margin-top: 30px;
     font-family: "Inknut Antiqua", serif;
     font-weight: 900;
     font-style: normal;
@@ -95,7 +96,7 @@ button:hover {
 }
 
 .table-data {
-    margin-top: 10px;
+    margin: 10px 10px 100px 10px;
     display: flex;
     width: 800px;
     justify-content: space-between;

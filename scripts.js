@@ -309,11 +309,6 @@ function createAdjacencyMatrix(){
     // console.log(adj_matrix);
 }
 
-function dijkstra() {
-    const fromNode = document.getElementById('node-from-dij').value;
-    const toNode = document.getElementById('node-to-dij').value;
-    console.log(fromNode, toNode)
-}
 // returns an array of components (1 component = array of connected node IDs)
 function getComponents() { 
     var allNodes = nodes.get().map(n => n.id)
@@ -436,12 +431,22 @@ function dijkstra() {
     // Perform Dijkstras
     // =============================================================================================
 
+    var directed = false;
+    if (document.getElementById('directed-path').checked) {
+        options.edges.arrows.to.enabled = true;
+        network.setOptions(options)
+        directed = true;
+    } else {
+        options.edges.arrows.to.enabled = false;
+        network.setOptions(options)
+    }
+
     const graph = {}; // Create an adjacency list representation of the graph
     edges.get().forEach(edge => {
         if (!graph[edge.from]) graph[edge.from] = {};
         if (!graph[edge.to]) graph[edge.to] = {};
         graph[edge.from][edge.to] = edge.value || 1; // Assuming edge weight is in the `value` field
-        if (!document.getElementById('directed-path').checked) {
+        if (!directed) {
             graph[edge.to][edge.from] = edge.value || 1; // Assuming the graph is undirected
         }
     });
