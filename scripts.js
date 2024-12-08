@@ -379,3 +379,6 @@ function showComponents() {
     }
     network.redraw();
 }
+
+function dijkstra() {
+}

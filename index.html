@@ -43,7 +43,7 @@
       <div class="add-node-container graph-logic">
         <h3>Add/Delete Node</h3>
         <label>Label:</label>
-        <input type="text" id="node-label" placeholder="Enter node label" />
+        <input type="number" id="node-label" placeholder="Enter node label" />
         <button onclick="addNode()">Add Node</button>
         <button onclick="deleteNode()">Delete Node</button>
       </div>
@@ -70,6 +70,17 @@
         <input type="number" id="edge-id" placeholder="Edge ID" />
         <button onclick="deleteEdge()">Delete Edge</button>
       </div>
+
+      <!-- Dijkstra's Input -->
+      <div class="add-edge-container graph-logic">
+        <h3>Find Shortest Path (Djikstra's)</h3>
+        <label for="edge-from">From Node ID:</label>
+        <input type="number" id="edge-from" placeholder="From ID" />
+        <label for="edge-to">To Node ID:</label>
+        <input type="number" id="edge-to" placeholder="To ID" />
+        <button onclick="dijkstra()">Add Edge</button><br>
+      </div>
+
     </div>
     <div class="table-data">
       <div class="node-degree-container">
