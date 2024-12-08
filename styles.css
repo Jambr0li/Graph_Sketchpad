@@ -12,7 +12,16 @@ button {
     background-color: #EAE0D5;
 }
 
-input {
+.clear-btn {
+    background-color: rgb(215, 99, 99);
+}
+
+.clear-btn:hover {
+    color: white;
+    background-color: rgb(194, 9, 9);
+}
+
+input[type="text"], input[type="number"] {
     border-radius: 3px;
     border-width: 1px;
     height: 1.3rem;
@@ -32,6 +41,7 @@ button:hover {
 }
 
 .title {
+    margin-top: 30px;
     font-family: "Inknut Antiqua", serif;
     font-weight: 900;
     font-style: normal;
@@ -86,7 +96,7 @@ button:hover {
 }
 
 .table-data {
-    margin-top: 10px;
+    margin: 10px 10px 100px 10px;
     display: flex;
     width: 800px;
     justify-content: space-between;

@@ -26,6 +26,15 @@ var options = {
 };
 var network = new vis.Network(container, data, options);
 
+function clearGraph() {
+    nodes.clear()
+    edges.clear()
+    node_count = 0;
+    edge_count = 0;
+    edge_id = 0;
+    updateGraphInfo()
+}
+
 function updateGraphInfo() {
     document.getElementById('node-count').textContent = node_count;
     document.getElementById('edge-count').textContent = edge_count;
@@ -38,6 +47,15 @@ function updateGraphInfo() {
         isBipartiteText.textContent = "Yes";
     else 
         isBipartiteText.textContent = "No";
+    edges.update( // reset the edge colors back to normal (to reset dijkstra coloring)
+        edges.get().map(edge => {
+          return {
+            id: edge.id, 
+            color: options.edges.color, 
+            width: 1 
+          };
+        })
+      );
 }
 
 function addNode() {
@@ -282,28 +300,47 @@ function createAdjacencyMatrix(){
     html += `</tbody></table>`;
     document.getElementById('adj-matrix').innerHTML = html;
 
-    //   loop through through and add each index
-    //         <th style="border: 1px solid #ccc; padding: 8px;">Node ID</th>
-    //         <th style="border: 1px solid #ccc; padding: 8px;">Degree</th>
-    //       </tr>
-    //     </thead>
-    //     <tbody>
-    // `;
-    // console.log(adj_obj);
-    // console.log(adj_matrix);
-    //adj_matrix.forEach((arr, index) => {
-        // console.log(index_to_node_ID[index], arr)
-        // arr.forEach(num => {
-        //     console.log(num);
-        // })
-    //})
+    // if no nodes, reset table to empty
+    if (adj_matrix.length == 0) {
+        let eigHtml = `
+            <h3>Eigenvalues</h3>
+            <p> None </p>
+            <h3>EigenVectors</h3>
+            <p> None </p>
+        `
+        document.getElementById('eig-results').innerHTML = eigHtml;
+        return;
+    }
+
+    const eig = math.eigs(adj_matrix)
+    const eigenvectors = transpose(eig.vectors); // Transpose the eigenvectors
+    // console.log(adj_matrix)
+    // Generate HTML for eigenvalues and eigenvectors
+
+    let eigHtml = `
+      <h3>Eigenvalues</h3>
+      <ul style="list-style-type: none; padding-left: 0;">`;
+    eig.values.forEach((value, index) => {
+        eigHtml += `<li style="padding: 5px;">λ<sub>${index + 1}</sub> = ${value.toFixed(3)}</li>`;
+    });
+    eigHtml += `</ul>`;
+
+    eigHtml += `<h3>Eigenvectors</h3>`;
+    eigenvectors.forEach((vector, index) => {
+        eigHtml += `<p style="padding: 5px;"><b>v<sub>${index + 1}</sub></b> = [${vector.map(v => v.toFixed(3)).join(', ')}]</p>`;
+    });
+
+    // Display the eigenvalues and eigenvectors
+    document.getElementById('eig-results').innerHTML = eigHtml;
+
+    // console.log("Eigenvalues:", eig.values);
+    // console.log("Eigenvectors:", eigenvectors);
 }
 
-function dijkstra() {
-    const fromNode = document.getElementById('node-from-dij').value;
-    const toNode = document.getElementById('node-to-dij').value;
-    console.log(fromNode, toNode)
+function transpose(matrix) {
+    return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
 }
+
 // returns an array of components (1 component = array of connected node IDs)
 function getComponents() { 
     var allNodes = nodes.get().map(n => n.id)
@@ -391,6 +428,126 @@ function toggleComponents() {
     network.redraw();
 }
 
+
+function dijkstra() {
+    updateGraphInfo()
+
+    // Check if nodes exist and they are in the same component:
+    // =============================================================================================
+
+    const fromNode = document.getElementById('node-from-dij').value;
+    const toNode = document.getElementById('node-to-dij').value;
+    var toNodeExists= nodes.get().find(function(n) {
+        return n.label === toNode;
+    })
+    var fromNodeExists= nodes.get().find(function(n) {
+        return n.label === fromNode;
+    })
+    if (!toNodeExists || !fromNodeExists) {
+        alert("One or both of those nodes don't exist!")
+    }
+
+    const components = getComponents()
+    var possible = false;
+    for (const component of components) {
+        if (component.includes(Number(fromNode)) && component.includes(Number(toNode))) {
+            possible = true; // we found that there exists a component that contains both nodes
+        }
+    }
+    if (!possible) {
+        alert(`Node ${fromNode} and node ${toNode} are in 2 different components, so there is no path between them.`)
+        return;
+    }
+    // =============================================================================================
+
+    // Perform Dijkstras
+    // =============================================================================================
+
+    var directed = false;
+    if (document.getElementById('directed-path').checked) {
+        options.edges.arrows.to.enabled = true;
+        network.setOptions(options)
+        directed = true;
+    } else {
+        options.edges.arrows.to.enabled = false;
+        network.setOptions(options)
+    }
+
+    const graph = {}; // Create an adjacency list representation of the graph
+    edges.get().forEach(edge => {
+        if (!graph[edge.from]) graph[edge.from] = {};
+        if (!graph[edge.to]) graph[edge.to] = {};
+        graph[edge.from][edge.to] = edge.value || 1; // Assuming edge weight is in the `value` field
+        if (!directed) {
+            graph[edge.to][edge.from] = edge.value || 1; // Assuming the graph is undirected
+        }
+    });
+
+    const distances = {}; // Store shortest distances to each node
+    const previous = {}; // Track the previous node for the shortest path
+    const visited = new Set();
+    const queue = Object.keys(graph).map(Number); // All nodes as initial "queue"
+
+    // Initialize distances and previous nodes
+    for (const node of queue) {
+        distances[node] = Infinity;
+        previous[node] = null;
+    }
+    distances[fromNode] = 0;
+
+    while (queue.length > 0) {
+        // Find the node with the smallest distance
+        let current = queue.reduce((minNode, node) => {
+            return distances[node] < distances[minNode] ? node : minNode;
+        });
+
+        // Remove the current node from the queue
+        queue.splice(queue.indexOf(current), 1);
+        visited.add(current);
+
+        // Stop if we've reached the destination node
+        if (current == toNode) break;
+
+        // Update distances for neighbors
+        for (const neighbor in graph[current]) {
+            if (visited.has(Number(neighbor))) continue;
+
+            const newDist = distances[current] + graph[current][neighbor];
+            if (newDist < distances[neighbor]) {
+                distances[neighbor] = newDist;
+                previous[neighbor] = current;
+            }
+        }
+    }
+
+    // Trace back the shortest path
+    let path = [];
+    let currentNode = toNode;
+    while (currentNode) {
+        const prevNode = previous[currentNode];
+        if (prevNode !== null) {
+            path.push({ from: prevNode, to: currentNode });
+        }
+        currentNode = prevNode;
+    }
+    path = path.reverse(); // Reverse the path to start from `fromNode`
+
+    // Highlight the shortest path in the network
+    edges.update(
+        edges.get().map(edge => {
+            const isInPath = path.some(p => (p.from == edge.from && p.to == edge.to) || (p.from == edge.to && p.to == edge.from));
+            return {
+                id: edge.id,
+                color: isInPath ? "purple" : "#848484", // Highlight in red if part of the shortest path
+                width: isInPath ? 3 : 1 // Make the path edges thicker
+            };
+        })
+    );
+
+    // alert(`Shortest path found! The path is: ${path.map(p => `${p.from} -> ${p.to}`).join(", ")}`);
+    // =============================================================================================
+}
+
 function getBridges() {
     var bridges = [];
     for (var e of edges.get()) {
@@ -405,6 +562,7 @@ function getBridges() {
 }
 
 function toggleBridges() {
+    updateGraphInfo()
     var bridgeColor = "red";
     var nonBridgeColor = options.edges.color;
 
