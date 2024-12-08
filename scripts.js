@@ -294,19 +294,32 @@ function createAdjacencyMatrix(){
     html += `</tbody></table>`;
     document.getElementById('adj-matrix').innerHTML = html;
 
+    const eig = math.eigs(adj_matrix)
+    const eigenvectors = transpose(eig.vectors); // Transpose the eigenvectors
+    // console.log(adj_matrix)
+    // Generate HTML for eigenvalues and eigenvectors
+    let eigHtml = `
+      <h3>Eigenvalues</h3>
+      <ul style="list-style-type: none; padding-left: 0;">`;
+    eig.values.forEach((value, index) => {
+        eigHtml += `<li style="padding: 5px;">λ<sub>${index + 1}</sub> = ${value.toFixed(3)}</li>`;
+    });
+    eigHtml += `</ul>`;
 
+    eigHtml += `<h3>Eigenvectors</h3>`;
+    eigenvectors.forEach((vector, index) => {
+        eigHtml += `<p style="padding: 5px;"><b>v<sub>${index + 1}</sub></b> = [${vector.map(v => v.toFixed(3)).join(', ')}]</p>`;
+    });
 
-        //   loop through through and add each index
+    // Display the eigenvalues and eigenvectors
+    document.getElementById('eig-results').innerHTML = eigHtml;
 
-    //         <th style="border: 1px solid #ccc; padding: 8px;">Node ID</th>
-    //         <th style="border: 1px solid #ccc; padding: 8px;">Degree</th>
-    //       </tr>
-    //     </thead>
-    //     <tbody>
-    // `;
+    // console.log("Eigenvalues:", eig.values);
+    // console.log("Eigenvectors:", eigenvectors);
+}
 
-    // console.log(adj_obj);
-    // console.log(adj_matrix);
+function transpose(matrix) {
+    return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
 }
 
 // returns an array of components (1 component = array of connected node IDs)
