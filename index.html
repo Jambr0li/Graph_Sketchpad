@@ -27,6 +27,7 @@
     </div>
 
     <div>
+      <button onclick="clearGraph()" class="clear-btn">Clear Graph</button>
       <button onclick="toggleDirection()">Toggle Edge Direction</button>
       <button onclick="togglePhysics()">Toggle Physics</button>
       <button onclick="toggleComponents()">Show Components</button>
@@ -79,6 +80,10 @@
         <input type="number" id="node-from-dij" placeholder="Node ID" />
         <label>To</label>
         <input type="number" id="node-to-dij" placeholder="Node ID" />
+        <label for="directed-path">
+          <input type="checkbox" name="directed-path" id="directed-path">
+          Directed 
+        </label>
         <button onclick="dijkstra()">Find Path</button><br>
       </div>
 
