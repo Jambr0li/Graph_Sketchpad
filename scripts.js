@@ -7,7 +7,10 @@ var data = {
 var node_count = 0;
 var edge_count = 0;
 var edge_id = 0;
-var componentsShowed = true;
+
+var componentsVisible = false;
+var bridgesVisible = false;
+var physicsOn = true;
 
 var container = document.getElementById('network');
 var options = {
@@ -17,9 +20,9 @@ var options = {
     edges: {
         arrows: {
             to: {enabled: false}
-        }
+        },
+        color: "rgb(122,144,200)"
     },
-    physics: { enabled: true } ,
 };
 var network = new vis.Network(container, data, options);
 
@@ -129,9 +132,10 @@ function toggleDirection() {
 }
 
 function togglePhysics() {
-    var currentState = options.physics.enabled;
-    options.physics.enabled = !currentState;
-    network.setOptions(options);
+    physicsOn = !physicsOn;
+    for (var n of nodes.get()) {
+        nodes.update({id: n.id, physics: physicsOn});
+    }
 }
 
 function addEdge() {
@@ -207,9 +211,6 @@ function calculateDegrees() {
     document.getElementById('node-degrees').innerHTML = html;
 }
 
-function createAdjacencyMatrix(){
-}
-
 // returns an array of components (1 component = array of connected node IDs)
 function getComponents() { 
     var allNodes = nodes.get().map(n => n.id)
@@ -261,7 +262,7 @@ function generateCircle(center, radius, numPoints) {
 }
 
 function drawComponents(ctx) {
-    const concavity = 1000;
+    const concavity = 300;
     const radius = 30;
     const numPoints = 100;
     var components = getComponents();
@@ -285,14 +286,64 @@ function drawComponents(ctx) {
     }
 }
 
-function showComponents() {
-    if (componentsShowed) {
-        network.on("beforeDrawing", drawComponents);
-        componentsShowed = false;
+function toggleComponents() {
+    if (componentsVisible) {
+        network.off("beforeDrawing", drawComponents);
+        componentsVisible = false;
     }
     else {
-        network.off("beforeDrawing", drawComponents);
-        componentsShowed = true;
+        network.on("beforeDrawing", drawComponents);
+        componentsVisible = true;
     }
     network.redraw();
 }
+
+function getBridges() {
+    var bridges = [];
+    for (var e of edges.get()) {
+        var startNumComponents = getComponents().length; 
+        edges.remove(e);
+        var endNumComponents = getComponents().length; 
+        edges.add(e);
+        if (startNumComponents != endNumComponents) 
+            bridges.push(e);
+    }
+    return bridges;
+}
+
+function toggleBridges() {
+    var bridgeColor = "red";
+    var nonBridgeColor = options.edges.color;
+
+    var bridges;
+    if (bridgesVisible) {
+        bridges = [];
+        bridgesVisible = false; 
+    }
+    else {
+        var bridges = getBridges();
+        bridgesVisible = true;
+    }
+    var nonBridges = edges.get().filter(e => !bridges.includes(e));
+
+    for (var b of bridges) {
+        edges.update({
+            id: b.id,
+            color: bridgeColor,
+            highlight: bridgeColor,
+            hover: bridgeColor
+        });
+    }
+    for (var e of nonBridges) {
+        edges.update({
+            id: e.id,
+            color: nonBridgeColor,
+            highlight: nonBridgeColor,
+            hover: nonBridgeColor
+        });
+    }
+}
+
+function createAdjacencyMatrix(){
+}
+
