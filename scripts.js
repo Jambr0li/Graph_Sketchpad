@@ -381,4 +381,7 @@ function showComponents() {
 }
 
 function dijkstra() {
+    const fromNode = document.getElementById('node-from-dij').value;
+    const toNode = document.getElementById('node-to-dij').value;
+    console.log(fromNode, toNode)
 }
