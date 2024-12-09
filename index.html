@@ -35,13 +35,25 @@
       <p>
         Current mode: 
         <span id="mode-display">a</span>
+      </p>
+      <div>
+        <input type="text" id="node-label" placeholder="Enter custom label" />
+      </div>
+      <div id="color-palette" class="hidden">
+        Color palette:
+       <span 
+            id="color-previews" 
+            style="display: inline-block; 
+            margin-left: 10px;">
+        </span>
+        Pick new color:
         <input 
             type="color" 
             id="node-color-selection" 
-            class="hidden"
-            placeholder="(#000000 or 'red')" 
+            placeholder="#98c4fc"
+            value="#98c4fc"
         />
-      </p>
+      </div> 
       <div id="network"></div>
     </div>
 
@@ -63,11 +75,6 @@
     <div id="controls">
       <!-- Adding Nodes -->
       <div class="add-node-container graph-logic">
-        <h3>Add/Delete Node</h3>
-        <label>Label:</label>
-        <input type="number" id="node-label" placeholder="Enter node label" />
-        <button onclick="addNode()">Add Node</button>
-        <button onclick="deleteNode()">Delete Node</button>
       </div>
 
 
@@ -75,14 +82,14 @@
       <div class="add-edge-container graph-logic">
         <h3>Find Shortest Path (Djikstra's)</h3>
         <label>From</label>
-        <input type="number" id="node-from-dij" placeholder="Node ID" />
+        <input type="text" id="node-from-dij" placeholder="Node ID" />
         <label>To</label>
-        <input type="number" id="node-to-dij" placeholder="Node ID" />
+        <input type="text" id="node-to-dij" placeholder="Node ID" />
         <label for="directed-path">
           <input type="checkbox" name="directed-path" id="directed-path">
           Directed 
         </label>
-        <button onclick="dijkstra()">Find Path</button><br>
+        <button id="djikstra-btn">Find Path</button><br>
       </div>
 
     </div>

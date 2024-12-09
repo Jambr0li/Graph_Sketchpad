@@ -105,3 +105,9 @@ button:hover {
 .hidden {
     display: none;
 }
+
+#node-color-selection {
+    width: 20px;
+    height: 20px;
+}
+

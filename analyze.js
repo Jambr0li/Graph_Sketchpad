@@ -1,4 +1,4 @@
-export { updateGraphInfo, toggleBridges, toggleComponents }
+export { updateGraphInfo, toggleBridges, toggleComponents, djikstra }
 import { NetworkState } from "./network.js"
 
 function updateGraphInfo() {
@@ -71,7 +71,6 @@ function createAdjacencyMatrix(){
     // }
 
     const length = NetworkState.nodes.get().length;
-
     const node_ID_to_index = {};
     const index_to_node_ID= {};
     NetworkState.nodes.get().forEach((node,index) => {
@@ -254,7 +253,7 @@ function toggleComponents() {
 }
 
 
-function dijkstra() {
+function djikstra() {
     updateGraphInfo()
 
     // Check if NetworkState.nodes exist and they are in the same component:
@@ -275,7 +274,7 @@ function dijkstra() {
     const components = getComponents()
     var possible = false;
     for (const component of components) {
-        if (component.includes(Number(fromNode)) && component.includes(Number(toNode))) {
+        if (component.includes(fromNode) && component.includes(toNode)) {
             possible = true; // we found that there exists a component that contains both NetworkState.nodes
         }
     }
