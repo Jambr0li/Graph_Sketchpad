@@ -67,7 +67,6 @@ function initNetwork() {
 
 function setNodeSizeSmall(nodeId) {
     if (!NetworkState.nodes.get(nodeId)) return;
-    console.log("setting small size");
     NetworkState.nodes.update({
         id: nodeId,
         size: 20,
@@ -77,7 +76,6 @@ function setNodeSizeSmall(nodeId) {
 
 function setNodeSizeLarge(nodeId) {
     if (!NetworkState.nodes.get(nodeId)) return;
-    console.log("setting large size");
     NetworkState.nodes.update({
         id: nodeId,
         size: 25,

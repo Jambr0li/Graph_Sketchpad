@@ -41,7 +41,7 @@
   <div class="container-fluid py-4">
     <h1 class="title text-center mb-4">Interactive Graph Visualization</h1>
 
-    <div class="row justify-content-center mb-3">
+    <div class="row justify-content-center mb-3" style="min-height: 34px;">
       <div class="col-auto">
         <input type="text" id="node-label" class="form-control form-control-sm" placeholder="Enter custom label" />
       </div>
@@ -91,50 +91,91 @@
       </div>
     </div>
 
-    <!-- Controls -->
-    <div class="row justify-content-center mb-4">
-      <div id="controls" class="col-12 col-xl-8">
-        <div class="row g-3 p-3">
-          <div class="col-12 add-node-container graph-logic"></div>
-          <!-- Dijkstra's Input -->
-          <div class="col-12 add-edge-container graph-logic">
-            <h3 class="h6 fw-bold">Find Shortest Path (Dijkstra's)</h3>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-              <div>
-                <label class="me-2">From</label>
-                <input type="text" id="node-from-dij" placeholder="Node ID" class="form-control form-control-sm d-inline-block w-auto" />
-              </div>
-              <div>
-                <label class="me-2">To</label>
-                <input type="text" id="node-to-dij" placeholder="Node ID" class="form-control form-control-sm d-inline-block w-auto" />
-              </div>
-              <div class="form-check d-inline-block">
-                <input type="checkbox" class="form-check-input" name="directed-path" id="directed-path">
-                <label class="form-check-label" for="directed-path">Directed</label>
-              </div>
-              <button id="djikstra-btn" class="btn btn-sm btn-primary">Find Path</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Data Tables -->
     <div class="row justify-content-center table-data gx-4 gy-4">
-      <div class="col-12 col-lg-3 node-degree-container">
-        <h3 id="node-degree-title" class="h6 fw-bold mb-2"></h3>
-        <div id="node-degrees"></div>
-      </div>
-      <div class="col-12 col-lg-4 adj-matrix-container">
-        <h3 id="adj-matrix-title" class="h6 fw-bold mb-2"></h3>
-        <div id="adj-matrix"></div>
-      </div>
-      <div class="col-12 col-lg-3 eig-container">
-        <div id="eig-results"></div>
-      </div>
-    </div>
-  </div>
+        <div class="col-12">
+            <div class="container mt-4">
+                <!-- Tabs Navigation -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab" aria-controls="tab1" aria-selected="true">Dijkstra</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab" aria-controls="tab1" aria-selected="false">Node Degree</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab" aria-controls="tab2" aria-selected="false">Adjacency Matrix</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab4-tab" data-bs-toggle="tab" data-bs-target="#tab4" type="button" role="tab" aria-controls="tab3" aria-selected="false">Eigenvectors and Eigenvalues</button>
+                    </li>
+                </ul>
 
+                <!-- Tabs Content -->
+                <div class="tab-content mt-3" id="myTabContent">
+                    <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+                        <div class="row">
+                            <div class="col-12 ">
+
+                                <div class="row justify-content-center mb-4">
+                                    <div id="controls" class="col-12 col-xl-8">
+                                        <div class="row g-3 p-3">
+                                            <div class="col-12 add-node-container graph-logic"></div>
+                                            <!-- Dijkstra's Input -->
+                                            <div class="col-12 add-edge-container graph-logic">
+                                                <h3 class="h6 fw-bold">Find Shortest Path (Dijkstra's)</h3>
+                                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                                    <div>
+                                                        <label class="me-2">From</label>
+                                                        <input type="text" id="node-from-dij" placeholder="Node ID" class="form-control form-control-sm d-inline-block w-auto" />
+                                                    </div>
+                                                    <div>
+                                                        <label class="me-2">To</label>
+                                                        <input type="text" id="node-to-dij" placeholder="Node ID" class="form-control form-control-sm d-inline-block w-auto" />
+                                                    </div>
+                                                    <div class="form-check d-inline-block">
+                                                        <input type="checkbox" class="form-check-input" name="directed-path" id="directed-path">
+                                                        <label class="form-check-label" for="directed-path">Directed</label>
+                                                    </div>
+                                                    <button id="djikstra-btn" class="btn btn-sm btn-primary">Find Path</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade show active" id="tab2" role="tabpanel" aria-labelledby="tab1-tab">
+                        <div class="row">
+                            <div class="col-12 ">
+                                <h3 id="node-degree-title" class="h6 fw-bold mb-2"></h3>
+                                <div id="node-degrees"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="tab2-tab">
+                        <div class="row">
+                            <div class="col-12">
+                                <h3 id="adj-matrix-title" class="h6 fw-bold mb-2"></h3>
+                                <div id="adj-matrix"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="tab4" role="tabpanel" aria-labelledby="tab3-tab">
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="eig-results"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script type="module" src="init.js"></script>
 </body>
 </html>
