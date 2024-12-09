@@ -8,6 +8,14 @@
     - addEdge
     - deleteEdge
 
-- fix bugs
+- add a light grid or dots or something for scale
+
+
+- colors 
     - make colors work right when highlighted.
-    - make it more clear when node selected for edge adding
+    - have an adjustable default config color
+    - have color persist across color selection
+
+- fix bugs
+    - stop random nodes spawning on on delete
+    - have init call updateMode
