@@ -11,7 +11,7 @@ const NetworkState = {
     node_id: 0,
     componentsVisible: false, 
     bridgesVisible: false, 
-    physicsOn: true, 
+    physicsOn: false, 
     options: {
         height: "100%", 
         width: "100%", 
