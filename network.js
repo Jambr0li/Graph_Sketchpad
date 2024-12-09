@@ -266,8 +266,12 @@ function deleteNode(nodeId) {
 }
 
 function addEdge(fromId, toId) {
-    if (!NetworkState.nodes.get(fromId) || !NetworkState.nodes.get(toId)) {
-        alert('One or both node IDs do not exist.');
+    if (!NetworkState.nodes.get(fromId)) {
+        alert(`Node with id=<${fromId}> does not exist!`);
+        return;
+    }
+    if (!NetworkState.nodes.get(toId)) {
+        alert(`Node with id=<${toId}> does not exist!`);
         return;
     }
     NetworkState.edges.add({id: NetworkState.edge_id, from: fromId, to: toId, label: String(NetworkState.edge_id)});
@@ -430,11 +434,11 @@ function makeCubeGraph() {
     // Connect front to back: (1–5, 2–6, 3–7, 4–8)
     const edges = [
         // Front square
-        ["1","2"], ["2","3"], ["3","4"], ["4","1"],
+        [1,2], [2,3], [3,4], [4,1],
         // Back square
-        ["5","6"], ["6","7"], ["7","8"], ["8","5"],
+        [5,6], [6,7], [7,8], [8,5],
         // Connections between front and back
-        ["1","5"], ["2","6"], ["3","7"], ["4","8"]
+        [1,5], [2,6], [3,7], [4,8]
     ];
 
     for (let edge of edges) {
@@ -485,25 +489,25 @@ function makeHyperCube() {
 
     const outerEdges = [
         // Front square ('1'-'2'-'3'-'4')
-        ['1','2'], ['2','3'], ['3','4'], ['4','1'],
-        // Back square ('5'-'6'-'7'-'8')
-        ['5','6'], ['6','7'], ['7','8'], ['8','5'],
-        // Connections between front and back ('1'-'5', '2'-'6', '3'-'7', '4'-'8')
-        ['1','5'], ['2','6'], ['3','7'], ['4','8']
+        [1,2], [2,3], [3,4], [4,1],
+        // Back square (5-6-7-8)
+        [5,6], [6,7], [7,8], [8,5],
+        // Connections between front and back (1-5, 2-6, 3-7, 4-8)
+        [1,5], [2,6], [3,7], [4,8]
     ];
     
     const innerEdges = [
-        // Front square ('9'-'10'-'11'-'12')
-        ['9','10'], ['10','11'], ['11','12'], ['12','9'],
-        // Back square ('13'-'14'-'15'-'16')
-        ['13','14'], ['14','15'], ['15','16'], ['16','13'],
-        // Connections between front and back ('9'-'13', '10'-'14', '11'-'15', '12'-'16')
-        ['9','13'], ['10','14'], ['11','15'], ['12','16']
+        // Front square (9-10-11-12)
+        [9,10], [10,11], [11,12], [12,9],
+        // Back square (13-14-15-16)
+        [13,14], [14,15], [15,16], [16,13],
+        // Connections between front and back (9-13, 10-14, 11-15, 12-16)
+        [9,13], [10,14], [11,15], [12,16]
     ];
     
     const hyperEdges = [
-        ['1','9'], ['2','10'], ['3','11'], ['4','12'],
-        ['5','13'], ['6','14'], ['7','15'], ['8','16']
+        [1,9], [2,10], [3,11], [4,12],
+        [5,13], [6,14], [7,15], [8,16]
     ];
 
 
