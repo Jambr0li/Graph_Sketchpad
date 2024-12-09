@@ -399,18 +399,18 @@ function makeCubeGraph() {
     // We'll have a "front" square and a "back" square offset to give a sense of depth.
     // Front square (4 vertices):
     const frontSquare = [
-        { id: 1,  x: -100, y: -100 },
-        { id: 2,  x: 100,  y: -100 },
-        { id: 3,  x: 100,  y: 100 },
-        { id: 4,  x: -100, y: 100 }
+        { id: String(1),  x: -100, y: -100 },
+        { id: String(2),  x: 100,  y: -100 },
+        { id: String(3),  x: 100,  y: 100 },
+        { id: String(4),  x: -100, y: 100 }
     ];
 
     // Back square (4 vertices) slightly shifted:
     const backSquare = [
-        { id: 5,  x: -50,  y: -50 },
-        { id: 6,  x: 150,  y: -50 },
-        { id: 7,  x: 150,  y: 150 },
-        { id: 8,  x: -50,  y: 150 }
+        { id: String(5),  x: -50,  y: -50 },
+        { id: String(6),  x: 150,  y: -50 },
+        { id: String(7),  x: 150,  y: 150 },
+        { id: String(8),  x: -50,  y: 150 }
     ];
 
     // Add all nodes
@@ -430,11 +430,11 @@ function makeCubeGraph() {
     // Connect front to back: (1–5, 2–6, 3–7, 4–8)
     const edges = [
         // Front square
-        [1,2], [2,3], [3,4], [4,1],
+        ["1","2"], ["2","3"], ["3","4"], ["4","1"],
         // Back square
-        [5,6], [6,7], [7,8], [8,5],
+        ["5","6"], ["6","7"], ["7","8"], ["8","5"],
         // Connections between front and back
-        [1,5], [2,6], [3,7], [4,8]
+        ["1","5"], ["2","6"], ["3","7"], ["4","8"]
     ];
 
     for (let edge of edges) {
@@ -451,26 +451,26 @@ function makeHyperCube() {
     // Outer cube vertices (like a cube):
     // Two squares offset, connected to form a cube shape.
     const outerCube = [
-        {id: 1, x: -150, y: -150},
-        {id: 2, x: 150,  y: -150},
-        {id: 3, x: 150,  y: 150},
-        {id: 4, x: -150, y: 150},
-        {id: 5, x: -100, y: -100},
-        {id: 6, x: 200,  y: -100},
-        {id: 7, x: 200,  y: 200},
-        {id: 8, x: -100, y: 200}
+        {id: String(1), x: -150, y: -150},
+        {id: String(2), x: 150,  y: -150},
+        {id: String(3), x: 150,  y: 150},
+        {id: String(4), x: -150, y: 150},
+        {id: String(5), x: -100, y: -100},
+        {id: String(6), x: 200,  y: -100},
+        {id: String(7), x: 200,  y: 200},
+        {id: String(8), x: -100, y: 200}
     ];
 
     // Inner cube vertices (smaller cube inside):
     const innerCube = [
-        {id: 9,  x: -50, y: -50},
-        {id: 10, x: 50,  y: -50},
-        {id: 11, x: 50,  y: 50},
-        {id: 12, x: -50, y: 50},
-        {id: 13, x: -25, y: -25},
-        {id: 14, x: 75,  y: -25},
-        {id: 15, x: 75,  y: 75},
-        {id: 16, x: -25, y: 75}
+        {id: String(9),  x: -50, y: -50},
+        {id: String(10), x: 50,  y: -50},
+        {id: String(11), x: 50,  y: 50},
+        {id: String(12), x: -50, y: 50},
+        {id: String(13), x: -25, y: -25},
+        {id: String(14), x: 75,  y: -25},
+        {id: String(15), x: 75,  y: 75},
+        {id: String(16), x: -25, y: 75}
     ];
 
     var userPos = NetworkState.network.getViewPosition();
@@ -483,33 +483,29 @@ function makeHyperCube() {
         addNode(node.x+userPos.x, node.y+userPos.y);
     }
 
-    // Edges for the outer cube (like a cube from the previous example)
     const outerEdges = [
-        // Front square (1-2-3-4)
-        [1,2], [2,3], [3,4], [4,1],
-        // Back square (5-6-7-8)
-        [5,6], [6,7], [7,8], [8,5],
-        // Connections between front and back (1-5, 2-6, 3-7, 4-8)
-        [1,5], [2,6], [3,7], [4,8]
+        // Front square ('1'-'2'-'3'-'4')
+        ['1','2'], ['2','3'], ['3','4'], ['4','1'],
+        // Back square ('5'-'6'-'7'-'8')
+        ['5','6'], ['6','7'], ['7','8'], ['8','5'],
+        // Connections between front and back ('1'-'5', '2'-'6', '3'-'7', '4'-'8')
+        ['1','5'], ['2','6'], ['3','7'], ['4','8']
     ];
-
-    // Edges for the inner cube (9-16), structured the same way
+    
     const innerEdges = [
-        // Front square (9-10-11-12)
-        [9,10], [10,11], [11,12], [12,9],
-        // Back square (13-14-15-16)
-        [13,14], [14,15], [15,16], [16,13],
-        // Connections between front and back (9-13, 10-14, 11-15, 12-16)
-        [9,13], [10,14], [11,15], [12,16]
+        // Front square ('9'-'10'-'11'-'12')
+        ['9','10'], ['10','11'], ['11','12'], ['12','9'],
+        // Back square ('13'-'14'-'15'-'16')
+        ['13','14'], ['14','15'], ['15','16'], ['16','13'],
+        // Connections between front and back ('9'-'13', '10'-'14', '11'-'15', '12'-'16')
+        ['9','13'], ['10','14'], ['11','15'], ['12','16']
+    ];
+    
+    const hyperEdges = [
+        ['1','9'], ['2','10'], ['3','11'], ['4','12'],
+        ['5','13'], ['6','14'], ['7','15'], ['8','16']
     ];
 
-    // Edges connecting outer cube to inner cube
-    // Connect corresponding vertices in some pattern to mimic 4D edges
-    // Here we connect 1->9, 2->10, 3->11, 4->12, 5->13, 6->14, 7->15, 8->16
-    const hyperEdges = [
-        [1,9], [2,10], [3,11], [4,12],
-        [5,13], [6,14], [7,15], [8,16]
-    ];
 
     const allEdges = outerEdges.concat(innerEdges).concat(hyperEdges);
 

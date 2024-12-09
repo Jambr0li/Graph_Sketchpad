@@ -347,7 +347,6 @@ function djikstra() {
             }
         }
     }
-
     // Trace back the shortest path
     let path = [];
     let currentNode = toNode;
