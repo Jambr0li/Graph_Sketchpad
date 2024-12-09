@@ -1,5 +1,6 @@
-export { NetworkState, initNetwork, togglePhysics, toggleDirection, clearGraph, makeCycleGraph, makeCompleteGraph, makeCubeGraph, makeHyperCube }
-import { updateGraphInfo } from "./analyze.js"
+export { NetworkState, initNetwork, togglePhysics, toggleDirection, clearGraph, makeCycleGraph, 
+    makeCompleteGraph, makeCubeGraph, makeHyperCube, makeCartesianProduct }
+import { updateGraphInfo, getComponents } from "./analyze.js"
 import { ColorPickerState } from "./colorpicker.js"
 
 const NetworkState = {
@@ -339,89 +340,54 @@ function togglePhysics() {
 }
 
 function makeCycleGraph(n){
-    // Clear the current graph
-    clearGraph();
-
-
     const radius = 200;
     const centerX = 0;
     const centerY = 0;
+    const userPos = NetworkState.network.getViewPosition();
 
-    NetworkState.physicsOn = false;
-    document.getElementById('toggle-physics-btn').classList.remove('custom-active');
+    var nodeStart = NetworkState.node_id;
+    if (NetworkState.node_id == 0) nodeStart -= 1;
     // Add n nodes
     for (let i = 0; i < n; i++) {
-
         const angle = (2 * Math.PI * i) / n;
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
-
-        NetworkState.nodes.add({ 
-            id: i + 1, 
-            label: String(i + 1), 
-            x: x,
-            y: y,
-            physics: false,
-            color: getNodeColor()
-        });
-        NetworkState.node_count += 1;
+        const x = centerX + radius * Math.cos(angle) + userPos.x;
+        const y = centerY + radius * Math.sin(angle) + userPos.y;
+        addNode(x,y);
     }
 
     // Add edges to form a cycle: 1->2, 2->3, ..., (n-1)->n, n->1
     for (let i = 1; i <= n; i++) {
         const fromId = i;
         const toId = (i < n) ? i + 1 : 1; // if at the last node, connect back to 1
-        NetworkState.edges.add({
-            id: NetworkState.edge_id, 
-            from: fromId, 
-            to: toId, 
-            label: String(NetworkState.edge_id)
-        });
-        NetworkState.edge_id += 1;
-        NetworkState.edge_count += 1;
+        addEdge(String(fromId+nodeStart), String(toId+nodeStart));
     }
 
     updateGraphInfo()
 }
 
 function makeCompleteGraph(n) {
-    clearGraph();
-    NetworkState.physicsOn = false;
-    document.getElementById('toggle-physics-btn').classList.remove('custom-active');
-
     // Position nodes in a circle for a nice layout
     const radius = 200;
     const centerX = 0;
     const centerY = 0;
+    const userPos = NetworkState.network.getViewPosition();
 
     // Add nodes
+    var nodeStart = NetworkState.node_id;
+    if (NetworkState.node_id == 0) nodeStart -= 1;
     for (let i = 0; i < n; i++) {
         const angle = (2 * Math.PI * i) / n;
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
-
-        NetworkState.nodes.add({
-            id: i + 1,
-            label: String(i + 1),
-            x: x,
-            y: y,
-            physics: false, // Keep them in place
-            color: getNodeColor()
-        });
-        NetworkState.node_count += 1;
+        const x = centerX + radius * Math.cos(angle) + userPos.x;
+        const y = centerY + radius * Math.sin(angle) + userPos.y;
+        addNode(x,y);
     }
 
     // Add edges: For a complete graph, connect every pair of nodes
     for (let i = 1; i <= n; i++) {
         for (let j = i + 1; j <= n; j++) {
-            NetworkState.edges.add({
-                id: NetworkState.edge_id,
-                from: i,
-                to: j,
-                label: String(NetworkState.edge_id)
-            });
-            NetworkState.edge_id += 1;
-            NetworkState.edge_count += 1;
+            var fromId = String(i+nodeStart);
+            var toId = String(j+nodeStart);
+            addEdge(fromId, toId);
         }
     }
 
@@ -429,8 +395,6 @@ function makeCompleteGraph(n) {
 }
 
 function makeCubeGraph() {
-    clearGraph();
-
     // Define node positions to look like a cube in 2D:
     // We'll have a "front" square and a "back" square offset to give a sense of depth.
     // Front square (4 vertices):
@@ -450,16 +414,13 @@ function makeCubeGraph() {
     ];
 
     // Add all nodes
+    var userPos = NetworkState.network.getViewPosition();
+    var nodeStart = NetworkState.node_id;
+    if (NetworkState.node_id == 0) nodeStart -= 1;
+
     const allNodes = frontSquare.concat(backSquare);
     for (let node of allNodes) {
-        NetworkState.nodes.add({
-            id: node.id,
-            label: String(node.id),
-            x: node.x,
-            y: node.y,
-            physics: false,
-            color: getNodeColor()
-        });
+        addNode(node.x+userPos.x, node.y+userPos.y);
         NetworkState.node_count += 1;
     }
 
@@ -477,14 +438,9 @@ function makeCubeGraph() {
     ];
 
     for (let edge of edges) {
-        NetworkState.edges.add({
-            id: NetworkState.edge_id,
-            from: edge[0],
-            to: edge[1],
-            label: String(NetworkState.edge_id)
-        });
-        NetworkState.edge_id++;
-        NetworkState.edge_count++;
+        var fromId = String(edge[0]+nodeStart);
+        var toId = String(edge[1]+nodeStart);
+        addEdge(fromId, toId);
     }
 
     // network.fit(); // If using a global network variable to fit the view
@@ -492,10 +448,6 @@ function makeCubeGraph() {
 }
 
 function makeHyperCube() {
-    clearGraph();
-    NetworkState.physicsOn = false;
-    document.getElementById('toggle-physics-btn').classList.remove('custom-active');
-
     // Outer cube vertices (like a cube):
     // Two squares offset, connected to form a cube shape.
     const outerCube = [
@@ -521,18 +473,14 @@ function makeHyperCube() {
         {id: 16, x: -25, y: 75}
     ];
 
+    var userPos = NetworkState.network.getViewPosition();
+    var nodeStart = NetworkState.node_id;
+    if (NetworkState.node_id == 0) nodeStart -= 1;
+
     // Add all nodes
     const allNodes = outerCube.concat(innerCube);
     for (let node of allNodes) {
-        NetworkState.nodes.add({
-            id: node.id,
-            label: String(node.id),
-            x: node.x,
-            y: node.y,
-            physics: false,
-            color: getNodeColor()
-        });
-        NetworkState.node_count += 1;
+        addNode(node.x+userPos.x, node.y+userPos.y);
     }
 
     // Edges for the outer cube (like a cube from the previous example)
@@ -567,15 +515,83 @@ function makeHyperCube() {
 
     // Add all edges
     for (let edge of allEdges) {
-        NetworkState.edges.add({
-            id: NetworkState.edge_id,
-            from: edge[0],
-            to: edge[1],
-            label: String(NetworkState.edge_id)
-        });
-        NetworkState.edge_id++;
-        NetworkState.edge_count++;
+        var fromId = String(edge[0]+nodeStart);
+        var toId = String(edge[1]+nodeStart);
+        addEdge(fromId, toId);
     }
 
     updateGraphInfo()
+}
+
+function cartesianProductGraph(nodeIds1, nodeIds2) {
+    const nodes = [];
+    const edges = [];
+
+    // Generate nodes for the Cartesian product
+    for (const id1 of nodeIds1) {
+        for (const id2 of nodeIds2) {
+            const newId = `${id1}-${id2}`;
+            const newLabel = `(${id1}, ${id2})`;
+            nodes.push({ id: newId, label: newLabel });
+        }
+    }
+
+    // Generate edges between nodes based on Cartesian product properties
+    for (const id1 of nodeIds1) {
+        for (const id2 of nodeIds2) {
+            for (const id2Alt of nodeIds2) {
+                if (id2 !== id2Alt) {
+                    edges.push({
+                        from: `${id1}-${id2}`,
+                        to: `${id1}-${id2Alt}`
+                    });
+                }
+            }
+            for (const id1Alt of nodeIds1) {
+                if (id1 !== id1Alt) {
+                    edges.push({
+                        from: `${id1}-${id2}`,
+                        to: `${id1Alt}-${id2}`
+                    });
+                }
+            }
+        }
+    }
+
+    return { nodes, edges };
+}
+
+function makeCartesianProduct() {
+    var nodeId1 = document.getElementById("node1-id").value;
+    var nodeId2 = document.getElementById("node2-id").value;
+    var components = getComponents();
+    
+    if (!NetworkState.nodes.get(nodeId1)) {
+        alert(`Node ID ${nodeId1} does not exist!`);
+        return;
+    }
+    if (!NetworkState.nodes.get(nodeId2)) {
+        alert(`Node ID ${nodeId2} does not exist!`);
+        return;
+    }
+
+    var comp1 = null;
+    var comp2 = null;
+    for (var c of components) {
+        if (!comp1)
+            if (c.includes(nodeId1)) comp1 = c;
+        else
+            if (c.includes(nodeId2)) comp2 = c;
+    }
+
+    if (comp2 == null || comp1 == comp2) {
+        alert("Node Id 1 and Node Id 2 are in the same component! Select nodes in different components.");
+    }
+
+    var out = cartesianProductGraph(comp1, comp2);
+    for (var n of out.nodes) {
+        NetworkState.nodes.add({
+            
+        });
+    }
 }

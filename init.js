@@ -1,4 +1,5 @@
-import { initNetwork, togglePhysics, toggleDirection, clearGraph, makeCycleGraph, makeCompleteGraph, makeCubeGraph, makeHyperCube } from "./network.js";
+import { initNetwork, togglePhysics, toggleDirection, clearGraph, makeCycleGraph, makeCompleteGraph, 
+        makeCubeGraph, makeHyperCube, makeCartesianProduct} from "./network.js";
 import { toggleBridges, toggleComponents, djikstra } from "./analyze.js";
 import { initColorPicker } from "./colorpicker.js"
 
@@ -25,3 +26,5 @@ cycleSizes.forEach(n => {
         btn2.addEventListener("click", () => makeCompleteGraph(n));
     }
 });
+
+document.getElementById("generate-cartesian").addEventListener("click", makeCartesianProduct);

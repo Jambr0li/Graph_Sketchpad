@@ -1,4 +1,4 @@
-export { updateGraphInfo, toggleBridges, toggleComponents, djikstra }
+export { updateGraphInfo, toggleBridges, toggleComponents, djikstra, getComponents }
 import { NetworkState } from "./network.js"
 
 function updateGraphInfo() {
