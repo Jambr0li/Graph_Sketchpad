@@ -25,15 +25,32 @@
   <div class="content">
     <div class="network-content">
       <h1 class="title">Interactive Graph Visualization</h1>
+      <p> Press key to switch modes: 
+      <ul> 
+        <li>a: add nodes / edges</li>
+        <li>s: select/move nodes</li>
+        <li>d: delete nodes/edges</li>
+        <li>c: color nodes</li>
+      </ul>
+      <p>
+        Current mode: 
+        <span id="mode-display">a</span>
+        <input 
+            type="color" 
+            id="node-color-selection" 
+            class="hidden"
+            placeholder="(#000000 or 'red')" 
+        />
+      </p>
       <div id="network"></div>
     </div>
 
     <div>
-      <button onclick="clearGraph()" class="clear-btn">Clear Graph</button>
-      <button onclick="toggleDirection()">Toggle Edge Direction</button>
-      <button onclick="togglePhysics()">Toggle Physics</button>
-      <button onclick="toggleComponents()">Show Components</button>
-      <button onclick="toggleBridges()">Show Bridges</button>
+      <button id="clear-btn" class="clear-btn">Clear Graph</button>
+      <button id="toggle-directions-btn" class="toggle-btn">Toggle Edge Direction</button>
+      <button id="toggle-physics-btn" class="toggle-btn">Toggle Physics</button>
+      <button id="toggle-components-btn" class="toggle-btn">Show Components</button>
+      <button id="toggle-bridges-btn" class="toggle-btn">Show Bridges</button>
     </div>
 
     <div class="graph-info">
@@ -53,28 +70,6 @@
         <button onclick="deleteNode()">Delete Node</button>
       </div>
 
-      <!-- Set Node Color-->
-      <div class="set-node-color-container graph-logic">
-        <h3>Change Node Color</h3>
-        <label>Label:</label>
-        <input type="number" id="node-color-label" placeholder="Enter node label" />
-        <label>Color:</label>
-        <input type="color" id="node-color-selection" placeholder="(#000000 or 'red')" />
-        <button onclick="setNodeColor()">Change Color</button>
-      </div>
-
-      <!-- Adding Edges -->
-      <div class="add-edge-container graph-logic">
-        <h3>Add/Delete Edge</h3>
-        <label for="edge-from">From</label>
-        <input type="number" id="edge-from" placeholder="Node ID" />
-        <label for="edge-to">To</label>
-        <input type="number" id="edge-to" placeholder="Node ID" />
-        <button onclick="addEdge()">Add Edge</button><br>
-        <label>Edge ID:</label>
-        <input type="number" id="edge-id" placeholder="Edge ID" />
-        <button onclick="deleteEdge()">Delete Edge</button>
-      </div>
 
       <!-- Dijkstra's Input -->
       <div class="add-edge-container graph-logic">
@@ -105,6 +100,6 @@
       </div>
     </div>
   </div>
-  <script src="scripts.js"></script>
+  <script type="module" src="init.js"></script>
 </body>
 </html>

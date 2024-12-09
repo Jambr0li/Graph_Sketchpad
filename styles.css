@@ -101,3 +101,7 @@ button:hover {
     width: 800px;
     justify-content: space-between;
 }
+
+.hidden {
+    display: none;
+}

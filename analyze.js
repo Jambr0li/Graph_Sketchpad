@@ -1,43 +1,9 @@
-var nodes = new vis.DataSet([]);
-var edges = new vis.DataSet([]);
-var data = {
-    nodes: nodes,
-    edges: edges
-};
-var node_count = 0;
-var edge_count = 0;
-var edge_id = 0;
-
-var componentsVisible = false;
-var bridgesVisible = false;
-var physicsOn = true;
-
-var container = document.getElementById('network');
-var options = {
-    height: '600px',
-    width: '800px',
-    interaction: { hover: true },
-    edges: {
-        arrows: {
-            to: {enabled: false}
-        },
-        color: "rgb(122,144,200)"
-    },
-};
-var network = new vis.Network(container, data, options);
-
-function clearGraph() {
-    nodes.clear()
-    edges.clear()
-    node_count = 0;
-    edge_count = 0;
-    edge_id = 0;
-    updateGraphInfo()
-}
+export { updateGraphInfo, toggleBridges, toggleComponents }
+import { NetworkState } from "./network.js"
 
 function updateGraphInfo() {
-    document.getElementById('node-count').textContent = node_count;
-    document.getElementById('edge-count').textContent = edge_count;
+    document.getElementById('node-count').textContent = NetworkState.node_count;
+    document.getElementById('edge-count').textContent = NetworkState.edge_count;
     var components = getComponents();
     document.getElementById("component-count").textContent = components.length;
     calculateDegrees()
@@ -47,163 +13,22 @@ function updateGraphInfo() {
         isBipartiteText.textContent = "Yes";
     else 
         isBipartiteText.textContent = "No";
-    edges.update( // reset the edge colors back to normal (to reset dijkstra coloring)
-        edges.get().map(edge => {
+    NetworkState.edges.update( // reset the edge colors back to normal (to reset dijkstra coloring)
+        NetworkState.edges.get().map(edge => {
           return {
             id: edge.id, 
-            color: options.edges.color, 
+            color: NetworkState.options.edges.color, 
             width: 1 
           };
         })
       );
 }
 
-function addNode() {
-    var label = document.getElementById('node-label').value;
-    if (label.trim() === '') {
-        alert('Please enter a label for the node.');
-        return;
-    }
-
-    var existingNode = nodes.get().find(function(n) {
-        return n.label === label;
-    })
-
-    if (existingNode) {
-        alert("That node already exists!")
-        document.getElementById('node-label').value = '';
-        return;
-    }
-
-    // ensure the new nodes appear in a reasonable place
-    var viewPosition = network.getViewPosition();
-    var scale = network.getScale();
-    var offset = 400 / scale;
-    var x = viewPosition.x + Math.random() * offset - offset / 2;
-    var y = viewPosition.y + Math.random() * offset - offset / 2;
-
-    nodes.add({ id: Number(label), label: label, x: x, y: y }, ); // set color inside this
-    document.getElementById('node-label').value = '';
-    node_count += 1;
-    updateGraphInfo();
-}
-
-function deleteNode() {
-    var label = document.getElementById('node-label').value;
-    if (label.trim() === '') {
-        alert('Please enter a label for the node.');
-        return;
-    }
-
-    var existingNode = nodes.get().find(function(n) {
-        return n.label === label;
-    })
-
-    if (!existingNode) {-
-        alert("That node doesn't exist!")
-        document.getElementById('node-label').value = '';
-        return;
-    }
-
-    nodes.remove({ id: Number(label), label: label});
-    node_count -= 1;
-    document.getElementById('node-label').value = '';
-
-    // Check if node being deleted has an edge attatched to it.
-    for (const edge of edges.get()) {
-        if (edge.from === existingNode.id || edge.to === existingNode.id) {
-            edges.remove(edge.id)
-            edge_count -= 1;
-        }
-    }
-    updateGraphInfo();
-}
-
-function setNodeColor() {
-    var label = document.getElementById('node-color-label').value;
-    var color = document.getElementById('node-color-selection').value;
-    var existingNode = nodes.get().find(function(n) {
-        return n.label === label;
-    })
-
-    if (!existingNode) {
-        alert("That node doesn't exist!")
-        document.getElementById('node-deletion-label').value = '';
-        return;
-    }
-
-    nodes.update({
-        id: Number(label),
-        color: {
-            background: color,
-            border: "grey",
-            highlight: {
-              background: "#97C2FC",
-              border: "#2B7CE9"
-            },
-            hover: {
-              background: color,
-              border: "black" 
-            }
-          }
-    })
-}
-
-function toggleDirection() {
-    var currentState = options.edges.arrows.to.enabled;
-    options.edges.arrows.to.enabled = !currentState;
-    network.setOptions(options);
-    updateGraphInfo();
-}
-
-function togglePhysics() {
-    physicsOn = !physicsOn;
-    for (var n of nodes.get()) {
-        nodes.update({id: n.id, physics: physicsOn});
-    }
-}
-
-function addEdge() {
-    var fromId = parseInt(document.getElementById('edge-from').value);
-    var toId = parseInt(document.getElementById('edge-to').value);
-    if (isNaN(fromId) || isNaN(toId)) {
-        alert('Please enter valid node IDs.');
-        return;
-    }
-    if (!nodes.get(fromId) || !nodes.get(toId)) {
-        alert('One or both node IDs do not exist.');
-        return;
-    }
-    edges.add({id: edge_id, from: fromId, to: toId, label: String(edge_id)});
-    edge_id += 1;
-    document.getElementById('edge-from').value = '';
-    document.getElementById('edge-to').value = '';
-    edge_count += 1;
-    updateGraphInfo();
-}
-
-function deleteEdge() {
-    var EdgeID = parseInt(document.getElementById('edge-id').value);
-    if (isNaN(EdgeID)) {
-        alert('Please enter valid node IDs.');
-        return;
-    }
-    if (!edges.get(EdgeID)) {
-        alert('Edge ID does not exist!');
-        return;
-    }
-    edges.remove({id: EdgeID});
-    edge_count -= 1;
-    document.getElementById('edge-count').textContent = edge_count;
-    document.getElementById('edge-id').value = ''
-    updateGraphInfo();
-}
-
 function calculateDegrees() {
     const degreeCount = {}
-    for (const node of nodes.get()){ // for each node
+    for (const node of NetworkState.nodes.get()){ // for each node
         degreeCount[node.id] = 0; // initialize degree count to 0
-        for (const edge of edges.get()) {
+        for (const edge of NetworkState.edges.get()) {
             if (edge.to === node.id || edge.from === node.id){
                 degreeCount[node.id] += 1
             }
@@ -239,17 +64,17 @@ function calculateDegrees() {
 }
 
 function createAdjacencyMatrix(){
-    // Create a dictionary of what nodes are connected
+    // Create a dictionary of what NetworkState.nodes are connected
     // {
     //  1 -> 2,3,4
     //  2 -> 4
     // }
 
-    const length = nodes.get().length;
+    const length = NetworkState.nodes.get().length;
 
     const node_ID_to_index = {};
     const index_to_node_ID= {};
-    nodes.get().forEach((node,index) => {
+    NetworkState.nodes.get().forEach((node,index) => {
         node_ID_to_index[node.id] = index;
         index_to_node_ID[index] = node.id;
     });
@@ -257,17 +82,17 @@ function createAdjacencyMatrix(){
     // Then create an adjacency matrix using this information.
 
     var adj_obj = {}
-    for (const node of nodes.get()) {
+    for (const node of NetworkState.nodes.get()) {
         adj_obj[node.id] = new Set();
     }
-    for (const edge of edges.get()) {
+    for (const edge of NetworkState.edges.get()) {
         adj_obj[edge.to].add(edge.from);
         adj_obj[edge.from].add(edge.to);
     }
 
     // construct the adj matrix
     var adj_matrix = Array.from({ length: length }, () => Array(length).fill(0));
-    for (const node of nodes.get()) {
+    for (const node of NetworkState.nodes.get()) {
         const fromIndex = node_ID_to_index[node.id]
         for (const connection of adj_obj[node.id]){
             const toIndex = node_ID_to_index[connection]
@@ -300,7 +125,7 @@ function createAdjacencyMatrix(){
     html += `</tbody></table>`;
     document.getElementById('adj-matrix').innerHTML = html;
 
-    // if no nodes, reset table to empty
+    // if no NetworkState.nodes, reset table to empty
     if (adj_matrix.length == 0) {
         let eigHtml = `
             <h3>Eigenvalues</h3>
@@ -343,7 +168,7 @@ function transpose(matrix) {
 
 // returns an array of components (1 component = array of connected node IDs)
 function getComponents() { 
-    var allNodes = nodes.get().map(n => n.id)
+    var allNodes = NetworkState.nodes.get().map(n => n.id)
     var components = [];
     while(allNodes.length > 0) {
         var curComponent = [];
@@ -351,7 +176,7 @@ function getComponents() {
         while (toVisit.length > 0) {
             var curNode = toVisit.pop();
             if (curComponent.includes(curNode)) continue;
-            toVisit = toVisit.concat(network.getConnectedNodes(curNode));
+            toVisit = toVisit.concat(NetworkState.network.getConnectedNodes(curNode));
             curComponent.push(curNode);
         }
         allNodes = allNodes.filter(n => !curComponent.includes(n));
@@ -397,7 +222,7 @@ function drawComponents(ctx) {
     const numPoints = 100;
     var components = getComponents();
     for (var nodeIDs of components) {
-        var positions = network.getPositions(nodeIDs);
+        var positions = NetworkState.network.getPositions(nodeIDs);
         var points = Object.values(positions)
         var circlePoints = [];
         for (var p of points) {
@@ -417,41 +242,41 @@ function drawComponents(ctx) {
 }
 
 function toggleComponents() {
-    if (componentsVisible) {
-        network.off("beforeDrawing", drawComponents);
-        componentsVisible = false;
+    if (NetworkState.componentsVisible) {
+        NetworkState.network.off("beforeDrawing", drawComponents);
+        NetworkState.componentsVisible = false;
     }
     else {
-        network.on("beforeDrawing", drawComponents);
-        componentsVisible = true;
+        NetworkState.network.on("beforeDrawing", drawComponents);
+        NetworkState.componentsVisible = true;
     }
-    network.redraw();
+    NetworkState.network.redraw();
 }
 
 
 function dijkstra() {
     updateGraphInfo()
 
-    // Check if nodes exist and they are in the same component:
+    // Check if NetworkState.nodes exist and they are in the same component:
     // =============================================================================================
 
     const fromNode = document.getElementById('node-from-dij').value;
     const toNode = document.getElementById('node-to-dij').value;
-    var toNodeExists= nodes.get().find(function(n) {
+    var toNodeExists= NetworkState.nodes.get().find(function(n) {
         return n.label === toNode;
     })
-    var fromNodeExists= nodes.get().find(function(n) {
+    var fromNodeExists= NetworkState.nodes.get().find(function(n) {
         return n.label === fromNode;
     })
     if (!toNodeExists || !fromNodeExists) {
-        alert("One or both of those nodes don't exist!")
+        alert("One or both of those NetworkState.nodes don't exist!")
     }
 
     const components = getComponents()
     var possible = false;
     for (const component of components) {
         if (component.includes(Number(fromNode)) && component.includes(Number(toNode))) {
-            possible = true; // we found that there exists a component that contains both nodes
+            possible = true; // we found that there exists a component that contains both NetworkState.nodes
         }
     }
     if (!possible) {
@@ -465,16 +290,16 @@ function dijkstra() {
 
     var directed = false;
     if (document.getElementById('directed-path').checked) {
-        options.edges.arrows.to.enabled = true;
-        network.setOptions(options)
+        NetworkState.options.edges.arrows.to.enabled = true;
+        NetworkState.network.setOptions(NetworkState.options)
         directed = true;
     } else {
-        options.edges.arrows.to.enabled = false;
-        network.setOptions(options)
+        NetworkState.options.edges.arrows.to.enabled = false;
+        NetworkState.network.setOptions(NetworkState.options)
     }
 
     const graph = {}; // Create an adjacency list representation of the graph
-    edges.get().forEach(edge => {
+    NetworkState.edges.get().forEach(edge => {
         if (!graph[edge.from]) graph[edge.from] = {};
         if (!graph[edge.to]) graph[edge.to] = {};
         graph[edge.from][edge.to] = edge.value || 1; // Assuming edge weight is in the `value` field
@@ -486,9 +311,9 @@ function dijkstra() {
     const distances = {}; // Store shortest distances to each node
     const previous = {}; // Track the previous node for the shortest path
     const visited = new Set();
-    const queue = Object.keys(graph).map(Number); // All nodes as initial "queue"
+    const queue = Object.keys(graph).map(Number); // All NetworkState.nodes as initial "queue"
 
-    // Initialize distances and previous nodes
+    // Initialize distances and previous NetworkState.nodes
     for (const node of queue) {
         distances[node] = Infinity;
         previous[node] = null;
@@ -532,14 +357,14 @@ function dijkstra() {
     }
     path = path.reverse(); // Reverse the path to start from `fromNode`
 
-    // Highlight the shortest path in the network
-    edges.update(
-        edges.get().map(edge => {
+    // Highlight the shortest path in the NetworkState.network
+    NetworkState.edges.update(
+        NetworkState.edges.get().map(edge => {
             const isInPath = path.some(p => (p.from == edge.from && p.to == edge.to) || (p.from == edge.to && p.to == edge.from));
             return {
                 id: edge.id,
                 color: isInPath ? "purple" : "#848484", // Highlight in red if part of the shortest path
-                width: isInPath ? 3 : 1 // Make the path edges thicker
+                width: isInPath ? 3 : 1 // Make the path NetworkState.edges thicker
             };
         })
     );
@@ -550,11 +375,11 @@ function dijkstra() {
 
 function getBridges() {
     var bridges = [];
-    for (var e of edges.get()) {
+    for (var e of NetworkState.edges.get()) {
         var startNumComponents = getComponents().length; 
-        edges.remove(e);
+        NetworkState.edges.remove(e);
         var endNumComponents = getComponents().length; 
-        edges.add(e);
+        NetworkState.edges.add(e);
         if (startNumComponents != endNumComponents) 
             bridges.push(e);
     }
@@ -564,21 +389,21 @@ function getBridges() {
 function toggleBridges() {
     updateGraphInfo()
     var bridgeColor = "red";
-    var nonBridgeColor = options.edges.color;
+    var nonBridgeColor = NetworkState.options.edges.color;
 
     var bridges;
-    if (bridgesVisible) {
+    if (NetworkState.bridgesVisible) {
         bridges = [];
-        bridgesVisible = false; 
+        NetworkState.bridgesVisible = false; 
     }
     else {
         var bridges = getBridges();
-        bridgesVisible = true;
+        NetworkState.bridgesVisible = true;
     }
-    var nonBridges = edges.get().filter(e => !bridges.includes(e));
+    var nonBridges = NetworkState.edges.get().filter(e => !bridges.includes(e));
 
     for (var b of bridges) {
-        edges.update({
+        NetworkState.edges.update({
             id: b.id,
             color: bridgeColor,
             highlight: bridgeColor,
@@ -586,7 +411,7 @@ function toggleBridges() {
         });
     }
     for (var e of nonBridges) {
-        edges.update({
+        NetworkState.edges.update({
             id: e.id,
             color: nonBridgeColor,
             highlight: nonBridgeColor,
@@ -596,11 +421,11 @@ function toggleBridges() {
 }
 
 function getDirectedNeighbors(nodeId, direction) {
-    const connectedEdges = network.getConnectedEdges(nodeId); 
+    const connectedEdges = NetworkState.network.getConnectedEdges(nodeId); 
     const neighbors = [];
 
     connectedEdges.forEach(edgeId => {
-        const edge = edges.get(edgeId); 
+        const edge = NetworkState.edges.get(edgeId); 
         if (direction === 'outgoing' && edge.from === nodeId) {
             neighbors.push(edge.to);
         } else if (direction === 'incoming' && edge.to === nodeId) {
@@ -612,13 +437,13 @@ function getDirectedNeighbors(nodeId, direction) {
 }
 
 function isComponentBipartite(component) {
-    colors = {};
-    toVisit = [component[0]];
+    var colors = {};
+    var toVisit = [component[0]];
     colors[component[0]] = 0;
 
-    var getNeighbors = (options.edges.arrows.to.enabled) 
+    var getNeighbors = (NetworkState.options.edges.arrows.to.enabled) 
                     ? (node) => getDirectedNeighbors(node, "outgoing")
-                    : (node) => network.getConnectedNodes(node)
+                    : (node) => NetworkState.network.getConnectedNodes(node)
 
     while (toVisit.length > 0) {
         var curNode = toVisit.shift();
@@ -632,8 +457,6 @@ function isComponentBipartite(component) {
             }
         }
     }
-    
-    console.log("colors = ", colors);
 
     return true;
 }

@@ -1,0 +1,13 @@
+- custom labels
+    - what does current custom label thing do?
+    - make my own custom label thing
+
+- refactor
+    - addNode
+    - deleteNode
+    - addEdge
+    - deleteEdge
+
+- fix bugs
+    - make colors work right when highlighted.
+    - make it more clear when node selected for edge adding
