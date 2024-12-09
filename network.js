@@ -306,7 +306,6 @@ function getNodeColor() {
 }
 
 function updateNodeColor(nodeId) {
-    console.log("updating node color");
     NetworkState.nodes.update({
         id: nodeId,
         color: getNodeColor(),
@@ -335,7 +334,6 @@ function togglePhysics() {
     NetworkState.physicsOn = !NetworkState.physicsOn;
     NetworkState.physicsOn ? document.getElementById('toggle-physics-btn').classList.add('custom-active') : document.getElementById('toggle-physics-btn').classList.remove('custom-active');
     for (var n of NetworkState.nodes.get()) {
-        console.log("updating physics ");
         NetworkState.nodes.update({id: n.id, physics: NetworkState.physicsOn});
     }
 }
