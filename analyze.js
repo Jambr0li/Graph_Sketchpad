@@ -2,6 +2,7 @@ export { updateGraphInfo, toggleBridges, toggleComponents, djikstra }
 import { NetworkState } from "./network.js"
 
 function updateGraphInfo() {
+    document.getElementById('toggle-bridges-btn').classList.remove('custom-active')
     document.getElementById('node-count').textContent = NetworkState.node_count;
     document.getElementById('edge-count').textContent = NetworkState.edge_count;
     var components = getComponents();
@@ -250,6 +251,7 @@ function toggleComponents() {
         NetworkState.componentsVisible = true;
     }
     NetworkState.network.redraw();
+    NetworkState.componentsVisible ? document.getElementById('toggle-components-btn').classList.add('custom-active') : document.getElementById('toggle-components-btn').classList.remove('custom-active');
 }
 
 
@@ -291,10 +293,12 @@ function djikstra() {
     if (document.getElementById('directed-path').checked) {
         NetworkState.options.edges.arrows.to.enabled = true;
         NetworkState.network.setOptions(NetworkState.options)
+        document.getElementById('toggle-directions-btn').classList.add('custom-active');
         directed = true;
     } else {
         NetworkState.options.edges.arrows.to.enabled = false;
         NetworkState.network.setOptions(NetworkState.options)
+        document.getElementById('toggle-directions-btn').classList.remove('custom-active');
     }
 
     const graph = {}; // Create an adjacency list representation of the graph
@@ -400,6 +404,7 @@ function toggleBridges() {
         NetworkState.bridgesVisible = true;
     }
     var nonBridges = NetworkState.edges.get().filter(e => !bridges.includes(e));
+    NetworkState.bridgesVisible ? document.getElementById('toggle-bridges-btn').classList.add('custom-active') : document.getElementById('toggle-bridges-btn').classList.remove('custom-active');
 
     for (var b of bridges) {
         NetworkState.edges.update({

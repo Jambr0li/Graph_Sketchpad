@@ -13,8 +13,8 @@ const NetworkState = {
     bridgesVisible: false, 
     physicsOn: true, 
     options: {
-        height: "600px", 
-        width: "800px", 
+        height: "100%", 
+        width: "100%", 
         interaction: { 
             hover: true, 
             dragNodes: true,
@@ -329,11 +329,13 @@ function toggleDirection() {
     var currentState = NetworkState.options.edges.arrows.to.enabled;
     NetworkState.options.edges.arrows.to.enabled = !currentState;
     NetworkState.network.setOptions(NetworkState.options);
+    !currentState ? document.getElementById('toggle-directions-btn').classList.add('custom-active') : document.getElementById('toggle-directions-btn').classList.remove('custom-active');
     updateGraphInfo();
 }
 
 function togglePhysics() {
     NetworkState.physicsOn = !NetworkState.physicsOn;
+    NetworkState.physicsOn ? document.getElementById('toggle-physics-btn').classList.add('custom-active') : document.getElementById('toggle-physics-btn').classList.remove('custom-active');
     for (var n of NetworkState.nodes.get()) {
         console.log("updating physics ");
         NetworkState.nodes.update({id: n.id, physics: NetworkState.physicsOn});

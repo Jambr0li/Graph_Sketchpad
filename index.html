@@ -7,7 +7,9 @@
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@300;400;500;600;700;800;900&family=Jaro:opsz@6..72&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@600;700;800;900&family=Schibsted+Grotesk:wght@400;500;700;900&display=swap" 
+    rel="stylesheet">
   <!-- Bootstrap CSS -->
   <link 
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
@@ -22,91 +24,117 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="content">
-    <div class="network-content">
-      <h1 class="title">Interactive Graph Visualization</h1>
-      <p> Press key to switch modes: 
-      <ul> 
-        <li>a: add nodes / edges</li>
-        <li>s: select/move nodes</li>
-        <li>d: delete nodes/edges</li>
-        <li>c: color nodes</li>
+  <!-- Floating instructions panel: no user interaction blocking -->
+  <div id="instructions" class="rounded shadow-sm p-2">
+    <div style="pointer-events:auto;">
+      <strong>Press keys to switch modes:</strong>
+      <ul class="m-0 p-0" style="list-style:none;">
+        <li>a: add</li>
+        <li>s: select/move</li>
+        <li>d: delete</li>
+        <li>c: color</li>
       </ul>
-      <p>
-        Current mode: 
-        <span id="mode-display">a</span>
-      </p>
-      <div>
-        <input type="text" id="node-label" placeholder="Enter custom label" />
+      <small>Current mode: <span id="mode-display">a</span></small>
+    </div>
+  </div>
+
+  <div class="container-fluid py-4">
+    <h1 class="title text-center mb-4">Interactive Graph Visualization</h1>
+
+    <div class="row justify-content-center mb-3">
+      <div class="col-auto">
+        <input type="text" id="node-label" class="form-control form-control-sm" placeholder="Enter custom label" />
       </div>
-      <div id="color-palette" class="hidden">
-        Color palette:
-       <span 
-            id="color-previews" 
-            style="display: inline-block; 
-            margin-left: 10px;">
-        </span>
-        Pick new color:
-        <input 
-            type="color" 
-            id="node-color-selection" 
-            placeholder="#98c4fc"
-            value="#98c4fc"
-        />
-      </div> 
-      <div id="network"></div>
-    </div>
-
-    <div>
-      <button id="clear-btn" class="clear-btn">Clear Graph</button>
-      <button id="toggle-directions-btn" class="toggle-btn">Toggle Edge Direction</button>
-      <button id="toggle-physics-btn" class="toggle-btn">Toggle Physics</button>
-      <button id="toggle-components-btn" class="toggle-btn">Show Components</button>
-      <button id="toggle-bridges-btn" class="toggle-btn">Show Bridges</button>
-    </div>
-
-    <div class="graph-info">
-      <p class="graph-stat">Number of vertices: <span id="node-count">0</span></p>
-      <p class="graph-stat">Number of edges: <span id="edge-count">0</span></p>
-      <p class="graph-stat">Number of components: <span id="component-count">0</span></p>
-      <p class="graph-stat">Is Graph Bipartite: <span id="is-bipartite">Yes</span></p>
-    </div>
-
-    <div id="controls">
-      <!-- Adding Nodes -->
-      <div class="add-node-container graph-logic">
+      <div class="col-auto" id="color-palette" class="hidden">
+        <div class="d-flex align-items-center gap-2">
+          <span>Color palette:</span>
+          <span id="color-previews"></span>
+          <span>Pick new color:</span>
+          <input type="color" id="node-color-selection" value="#98c4fc"/>
+        </div>
       </div>
-
-
-      <!-- Dijkstra's Input -->
-      <div class="add-edge-container graph-logic">
-        <h3>Find Shortest Path (Djikstra's)</h3>
-        <label>From</label>
-        <input type="text" id="node-from-dij" placeholder="Node ID" />
-        <label>To</label>
-        <input type="text" id="node-to-dij" placeholder="Node ID" />
-        <label for="directed-path">
-          <input type="checkbox" name="directed-path" id="directed-path">
-          Directed 
-        </label>
-        <button id="djikstra-btn">Find Path</button><br>
-      </div>
-
     </div>
-    <div class="table-data">
-      <div class="node-degree-container">
-        <h3 id="node-degree-title"></h3>
+
+    <!-- Network row -->
+    <div class="row justify-content-center mb-3">
+      <div class="col-12 col-xl-10">
+        <div id="network"></div>
+      </div>
+    </div>
+
+    <!-- Buttons row -->
+    <div class="row justify-content-center mb-3 g-2">
+      <div class="col-auto">
+        <button id="clear-btn" class="clear-btn btn btn-sm btn-danger">Clear Graph</button>
+      </div>
+      <div class="col-auto">
+        <button id="toggle-directions-btn" class="toggle-btn btn btn-sm btn-outline-secondary">Toggle Edge Direction</button>
+      </div>
+      <div class="col-auto">
+        <button id="toggle-physics-btn" class="toggle-btn btn btn-sm btn-outline-secondary">Toggle Physics</button>
+      </div>
+      <div class="col-auto">
+        <button id="toggle-components-btn" class="toggle-btn btn btn-sm btn-outline-secondary">Show Components</button>
+      </div>
+      <div class="col-auto">
+        <button id="toggle-bridges-btn" class="toggle-btn btn btn-sm btn-outline-secondary">Show Bridges</button>
+      </div>
+    </div>
+
+    <!-- Graph stats -->
+    <div class="row justify-content-center mb-4">
+      <div class="col-auto d-flex flex-wrap align-items-center gap-3">
+        <p class="graph-stat m-0">Vertices: <span id="node-count">0</span></p>
+        <p class="graph-stat m-0">Edges: <span id="edge-count">0</span></p>
+        <p class="graph-stat m-0">Components: <span id="component-count">0</span></p>
+        <p class="graph-stat m-0">Bipartite: <span id="is-bipartite">Yes</span></p>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="row justify-content-center mb-4">
+      <div id="controls" class="col-12 col-xl-8">
+        <div class="row g-3 p-3">
+          <div class="col-12 add-node-container graph-logic"></div>
+          <!-- Dijkstra's Input -->
+          <div class="col-12 add-edge-container graph-logic">
+            <h3 class="h6 fw-bold">Find Shortest Path (Dijkstra's)</h3>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <div>
+                <label class="me-2">From</label>
+                <input type="text" id="node-from-dij" placeholder="Node ID" class="form-control form-control-sm d-inline-block w-auto" />
+              </div>
+              <div>
+                <label class="me-2">To</label>
+                <input type="text" id="node-to-dij" placeholder="Node ID" class="form-control form-control-sm d-inline-block w-auto" />
+              </div>
+              <div class="form-check d-inline-block">
+                <input type="checkbox" class="form-check-input" name="directed-path" id="directed-path">
+                <label class="form-check-label" for="directed-path">Directed</label>
+              </div>
+              <button id="djikstra-btn" class="btn btn-sm btn-primary">Find Path</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Tables -->
+    <div class="row justify-content-center table-data gx-4 gy-4">
+      <div class="col-12 col-lg-3 node-degree-container">
+        <h3 id="node-degree-title" class="h6 fw-bold mb-2"></h3>
         <div id="node-degrees"></div>
       </div>
-      <div class="adj-matrix-container">
-        <h3 id="adj-matrix-title"></h3>
+      <div class="col-12 col-lg-4 adj-matrix-container">
+        <h3 id="adj-matrix-title" class="h6 fw-bold mb-2"></h3>
         <div id="adj-matrix"></div>
       </div>
-      <div class="eig-container">
+      <div class="col-12 col-lg-3 eig-container">
         <div id="eig-results"></div>
       </div>
     </div>
   </div>
+
   <script type="module" src="init.js"></script>
 </body>
 </html>
