@@ -139,6 +139,9 @@ function updateModeText() {
 }
 
 function updateMode(event) {
+    // don't update mode if in a text box
+    if (document.activeElement.tagName === 'INPUT') return;
+
     if (event.key == "q" || event.key == "Escape") {
         unselectNodes();
         EditMode.prevSelectedNodeId = null;
