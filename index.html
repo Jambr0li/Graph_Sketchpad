@@ -27,35 +27,52 @@
   <!-- Floating instructions panel: no user interaction blocking -->
   <div id="instructions" class="rounded shadow-sm p-2">
     <div style="pointer-events:auto;">
-      <strong>Press keys to switch modes:</strong>
+        <strong>Current Mode</strong>
+        <p>(switch with keys)</p>
+
+      <hr style="margin: 10px 0">
+
       <ul class="m-0 p-0" style="list-style:none;">
-        <li>a: add</li>
-        <li>s: select/move</li>
-        <li>d: delete</li>
-        <li>c: color</li>
+        <li id="a-mode">a: add</li>
+        <li id="s-mode">s: select/move</li>
+        <li id="d-mode">d: delete</li>
+        <li id="c-mode">c: color</li>
       </ul>
-      <small>Current mode: <span id="mode-display">a</span></small>
+
+      <hr style="margin: 10px 0">
+
+      <input 
+        type="text" 
+        id="node-label" 
+        class="form-control form-control-sm" 
+        placeholder="Enter custom label"
+      />
+
+      <div id="color-palette" class="container-fluid mt-1 hidden" style="font-size:0.85rem">
+          <div class="row justify-content-center"> <div class="col-auto">
+            <span>Color palette</span>
+          </div> </div>
+          <div class="row justify-content-center mt-1 mb-1"> <div class="col-auto">
+            <span id="color-previews"></span>
+          </div> </div>
+          <div class="row justify-content-center"> 
+            <div class="col-auto">
+              <span>Pick new color: </span>
+              <input 
+                type="color" 
+                id="node-color-selection" 
+                value="#98c4fc" 
+              />
+            </div>
+          </div>
+      </div>
     </div>
   </div>
 
   <div class="container-fluid py-4">
     <h1 class="title text-center mb-4">Interactive Graph Visualization</h1>
 
-    <div class="row justify-content-center mb-3" style="min-height: 34px;">
-      <div class="col-auto">
-        <input type="text" id="node-label" class="form-control form-control-sm" placeholder="Enter custom label" />
-      </div>
-      <div class="col-auto" id="color-palette" class="hidden">
-        <div class="d-flex align-items-center gap-2">
-          <span>Color palette:</span>
-          <span id="color-previews"></span>
-          <span>Pick new color:</span>
-          <input type="color" id="node-color-selection" value="#98c4fc"/>
-        </div>
-      </div>
-    </div>
-
-    <!-- Network row -->
+   <!-- Network row -->
     <div class="row justify-content-center mb-3">
       <div class="col-12 col-xl-10">
         <div id="network"></div>

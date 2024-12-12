@@ -2,7 +2,7 @@ export { ColorPickerState, initColorPicker }
 
 const ColorPickerState = {
     color: "#98c4fc",
-    maxColors: 7,
+    maxColors: 24,
 };
 
 let selectedColorButton = null; // Track the currently selected color button
@@ -31,8 +31,8 @@ function updateColorPalette(event) {
 
     const colorButton = document.createElement('button');
     colorButton.style.backgroundColor = newColor;
-    colorButton.style.width = '20px';
-    colorButton.style.height = '20px';
+    colorButton.style.width = '15px';
+    colorButton.style.height = '15px';
     colorButton.style.border = '1px solid #000';
     colorButton.style.marginRight = '5px';
     colorButton.style.cursor = 'pointer';

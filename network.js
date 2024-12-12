@@ -19,6 +19,7 @@ const NetworkState = {
         interaction: { 
             hover: true, 
             dragNodes: true,
+            multiselect: true
         }, 
         nodes: {
             shape: 'dot',
@@ -113,6 +114,30 @@ function disableSelectedSize() {
     NetworkState.network.off("deselectNode", showDeselectedSize);
 }
 
+function updateModeText() {
+    const aModeText = document.getElementById("a-mode");
+    const sModeText = document.getElementById("s-mode");
+    const dModeText = document.getElementById("d-mode");
+    const cModeText = document.getElementById("c-mode");
+
+    aModeText.style.fontWeight = "normal";
+    sModeText.style.fontWeight = "normal";
+    dModeText.style.fontWeight = "normal";
+    cModeText.style.fontWeight = "normal";
+
+     
+    switch (EditMode.mode) {
+        case "a":
+            aModeText.style.fontWeight = "bold"; break;
+        case "s":
+            sModeText.style.fontWeight = "bold"; break;
+        case "d":
+            dModeText.style.fontWeight = "bold"; break;
+        case "c":
+            cModeText.style.fontWeight = "bold"; break;
+    }
+}
+
 function updateMode(event) {
     if (event.key == "q" || event.key == "Escape") {
         unselectNodes();
@@ -120,7 +145,6 @@ function updateMode(event) {
     }
     if (!["a", "s", "d", "c"].includes(event.key)) return;
 
-    var modeDisplay = document.getElementById("mode-display");
     var colorPalette = document.getElementById("color-palette");
     var customLabelInput = document.getElementById("node-label");
     var clickAction;
@@ -175,7 +199,7 @@ function updateMode(event) {
     EditMode.prevSelectedNodeId = null;
     NetworkState.network.setOptions(NetworkState.options);
     NetworkState.network.on("click", clickAction);
-    modeDisplay.textContent = EditMode.mode; 
+    updateModeText();
 }
 
 function addModeClick(event) {
@@ -447,4 +471,5 @@ function makeHyperCube() {
 }
 
 function makeCartesianProduct() {
+
 }
