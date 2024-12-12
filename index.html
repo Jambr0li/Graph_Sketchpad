@@ -91,36 +91,36 @@
       </div>
     </div>
 
-    <!-- Data Tables -->
+    <!-- Tabs -->
     <div class="row justify-content-center table-data gx-4 gy-4">
         <div class="col-12">
             <div class="container mt-4">
                 <!-- Tabs Navigation -->
                 <ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">Dijkstra</button>
+                        <button class="nav-link active" id="dijktra-tab-tab" data-bs-toggle="tab" data-bs-target="#dijktra-tab" type="button" role="tab">Dijkstra</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="tab5-tab" data-bs-toggle="tab" data-bs-target="#tab5" type="button" role="tab">Quick Constructions</button>
-                    </li>
-                    <li class="nav-item hidden" role="presentation">
-                        <button class="nav-link" id="tab6-tab" data-bs-toggle="tab" data-bs-target="#tab6" type="button" role="tab">Cartesian Product</button>
+                        <button class="nav-link" id="quick-constructions-tab-tab" data-bs-toggle="tab" data-bs-target="#quick-constructions-tab" type="button" role="tab">Quick Constructions</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">Node Degree</button>
+                        <button class="nav-link" id="cartesian-tab-tab" data-bs-toggle="tab" data-bs-target="#cartesian-tab" type="button" role="tab">Cartesian Product</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab">Adjacency Matrix</button>
+                        <button class="nav-link" id="node-degrees-tab-tab" data-bs-toggle="tab" data-bs-target="#node-degrees-tab" type="button" role="tab">Node Degree</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="tab4-tab" data-bs-toggle="tab" data-bs-target="#tab4" type="button" role="tab">Eigenvalues</button>
+                        <button class="nav-link" id="adjacency-matrix-tab-tab" data-bs-toggle="tab" data-bs-target="#adjacency-matrix-tab" type="button" role="tab">Adjacency Matrix</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="eigenvalues-tab-tab" data-bs-toggle="tab" data-bs-target="#eigenvalues-tab" type="button" role="tab">Eigenvalues</button>
                     </li>
                 </ul>
 
                 <!-- Tabs Content -->
                 <div class="tab-content mt-3" id="myTabContent">
                     <!-- djikstra tab -->
-                    <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+                    <div class="tab-pane fade show active" id="dijktra-tab" role="tabpanel" aria-labelledby="dijktra-tab-tab">
                         <div class="row">
                             <div class="col-12 ">
                                 <div class="row justify-content-center mb-4">
@@ -154,7 +154,7 @@
                     </div>
 
                     <!-- quick constructions tab -->
-                    <div class="tab-pane fade show" id="tab5" role="tabpanel">
+                    <div class="tab-pane fade show" id="quick-constructions-tab" role="tabpanel">
                         <div class="row h-100">
                             <div class="col-12 d-flex flex-column justify-content-center align-items-center" style="height: 100%;">
                                 <!-- Label and Standalone Buttons -->
@@ -202,7 +202,7 @@
                     </div>
 
                     <!-- cartesian product tab -->
-                    <div class="tab-pane fade show" id="tab6" role="tabpanel"> 
+                    <div class="tab-pane fade show" id="cartesian-tab" role="tabpanel"> 
                         <div class="row">
                             <div class="col-12 d-flex flex-column align-items-center">
                                 <h5 class="mb-3">Cartesian Product</h5>
@@ -226,7 +226,7 @@
                     </div>
 
                     <!-- node degrees tab -->
-                    <div class="tab-pane fade show" id="tab2" role="tabpanel"> 
+                    <div class="tab-pane fade show" id="node-degrees-tab" role="tabpanel"> 
                         <div class="row">
                             <div class="col-12 ">
                                 <h3 id="node-degree-title" class="h6 fw-bold mb-2"></h3>
@@ -236,7 +236,7 @@
                     </div>
 
                     <!-- adjacency matrix tab -->
-                    <div class="tab-pane fade" id="tab3" role="tabpanel">
+                    <div class="tab-pane fade" id="adjacency-matrix-tab" role="tabpanel">
                         <div class="row">
                             <div class="col-12">
                                 <h3 id="adj-matrix-title" class="h6 fw-bold mb-2"></h3>
@@ -246,7 +246,7 @@
                     </div>
 
                     <!-- eigenvalues tab -->
-                    <div class="tab-pane fade" id="tab4" role="tabpanel">
+                    <div class="tab-pane fade" id="eigenvalues-tab" role="tabpanel">
                         <div class="row">
                             <div class="col-12">
                                 <div id="eig-results"></div>

@@ -1,28 +1,40 @@
 export { updateGraphInfo, toggleBridges, toggleComponents, djikstra, getComponents }
 import { NetworkState } from "./network.js"
+import { QuickHull } from "./QuickHull.js"
+
+function getOpenTab() {
+    const activeTab = document.querySelector('.nav-link.active');
+    if (activeTab) {
+        return activeTab.getAttribute('data-bs-target').substring(1); // Remove the '#' prefix
+    }
+    return null;
+}
 
 function updateGraphInfo() {
-    document.getElementById('toggle-bridges-btn').classList.remove('custom-active')
-    document.getElementById('node-count').textContent = NetworkState.node_count;
-    document.getElementById('edge-count').textContent = NetworkState.edge_count;
-    var components = getComponents();
-    document.getElementById("component-count").textContent = components.length;
-    calculateDegrees()
-    createAdjacencyMatrix()
-    var isBipartiteText = document.getElementById("is-bipartite");
-    if (isGraphBipartite())
-        isBipartiteText.textContent = "Yes";
-    else 
-        isBipartiteText.textContent = "No";
+    NetworkState.components = getComponents();
+    NetworkState.bipartite = isGraphBipartite(); // must come after getComponents();
+
+    switch (getOpenTab()) {
+        case "node-degrees-tab":
+            calculateDegrees(); break;
+        case "adjacency-matrix-tab":
+            createAdjacencyMatrix(); break;
+    }
+
     NetworkState.edges.update( // reset the edge colors back to normal (to reset dijkstra coloring)
         NetworkState.edges.get().map(edge => {
-          return {
-            id: edge.id, 
-            color: NetworkState.options.edges.color, 
-            width: 1 
-          };
+            return {
+                id: edge.id, 
+                color: NetworkState.options.edges.color, 
+                width: 1 
+            };
         })
-      );
+    );
+    document.getElementById('toggle-bridges-btn').classList.remove('custom-active');
+    document.getElementById('node-count').textContent = NetworkState.node_count;
+    document.getElementById('edge-count').textContent = NetworkState.edge_count;
+    document.getElementById("component-count").textContent = NetworkState.components.length;
+    document.getElementById("is-bipartite").textContent = (NetworkState.bipartite) ? "Yes" : "No";
 }
 
 function calculateDegrees() {
@@ -217,10 +229,9 @@ function generateCircle(center, radius, numPoints) {
 }
 
 function drawComponents(ctx) {
-    const concavity = 300;
     const radius = 30;
-    const numPoints = 100;
-    var components = getComponents();
+    const numPoints = 16;
+    var components = NetworkState.components;
     for (var nodeIDs of components) {
         var positions = NetworkState.network.getPositions(nodeIDs);
         var points = Object.values(positions)
@@ -228,12 +239,12 @@ function drawComponents(ctx) {
         for (var p of points) {
             circlePoints = circlePoints.concat(generateCircle(p, radius, numPoints)); 
         }
-        const hullPoints = hull(circlePoints.map(p => [p.x,p.y]), concavity);
+        const hullPoints = QuickHull(circlePoints);
 
         ctx.beginPath();
-        ctx.moveTo(hullPoints[0][0], hullPoints[0][1]);
+        ctx.moveTo(hullPoints[0].x, hullPoints[0].y);
         for (let i = 1; i < hullPoints.length; i++) {
-            ctx.lineTo(hullPoints[i][0], hullPoints[i][1]);
+            ctx.lineTo(hullPoints[i].x, hullPoints[i].y);
         }
         ctx.closePath();
         ctx.fillStyle = getSeededColor(nodeIDs[0], 0.3);
@@ -273,7 +284,7 @@ function djikstra() {
         alert("One or both of those NetworkState.nodes don't exist!")
     }
 
-    const components = getComponents()
+    const components = NetworkState.components;
     var possible = false;
     for (const component of components) {
         if (component.includes(fromNode) && component.includes(toNode)) {
@@ -378,9 +389,9 @@ function djikstra() {
 function getBridges() {
     var bridges = [];
     for (var e of NetworkState.edges.get()) {
-        var startNumComponents = getComponents().length; 
+        var startNumComponents = NetworkState.components.length;
         NetworkState.edges.remove(e);
-        var endNumComponents = getComponents().length; 
+        var endNumComponents = NetworkState.components.length;
         NetworkState.edges.add(e);
         if (startNumComponents != endNumComponents) 
             bridges.push(e);
@@ -465,5 +476,5 @@ function isComponentBipartite(component) {
 }
 
 function isGraphBipartite() {
-    return getComponents().every(isComponentBipartite);
+    return NetworkState.components.every(isComponentBipartite);
 }
