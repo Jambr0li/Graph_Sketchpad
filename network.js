@@ -354,176 +354,96 @@ function togglePhysics() {
     }
 }
 
-function makeCycleGraph(n){
-    const radius = 200;
-    const centerX = 0;
-    const centerY = 0;
+function makeGraph(points, edges) {
     const userPos = NetworkState.network.getViewPosition();
     var nodeStart = NetworkState.node_id;
     if (NetworkState.node_id == 0) nodeStart -= 1;
+    addNodes(points.map(
+        p => [p[0]+userPos.x, p[1]+userPos.y]
+    ));
+    addEdges(edges.map(
+        e => [String(e[0]+nodeStart), String(e[1]+nodeStart)]
+    ));
+}
 
+function makeCycleGraph(n, radius=200){
     const nodePoints = [];
     for (let i = 0; i < n; i++) {
         const angle = (2 * Math.PI * i) / n;
-        const x = centerX + radius * Math.cos(angle) + userPos.x;
-        const y = centerY + radius * Math.sin(angle) + userPos.y;
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
         nodePoints.push([x,y]);
     }
-    addNodes(nodePoints);
-
     // Add edges to form a cycle: 1->2, 2->3, ..., (n-1)->n, n->1
     const edges = [];
     for (let i = 1; i <= n; i++) {
-        var fromId = String(i+nodeStart);
+        var fromId = i;
         var toId = (i < n) ? i + 1 : 1; // if at the last node, connect back to 1
-        toId = String(toId+nodeStart);
         edges.push([fromId,toId]);
     }
-    addEdges(edges);
+    makeGraph(nodePoints, edges);
 }
 
-function makeCompleteGraph(n) {
-    // Position nodes in a circle for a nice layout
-    const radius = 200;
-    const centerX = 0;
-    const centerY = 0;
-    const userPos = NetworkState.network.getViewPosition();
-    var nodeStart = NetworkState.node_id;
-    if (NetworkState.node_id == 0) nodeStart -= 1;
-
-    // Add nodes
+function makeCompleteGraph(n, radius=200) {
     const nodePoints = [];
     for (let i = 0; i < n; i++) {
         const angle = (2 * Math.PI * i) / n;
-        const x = centerX + radius * Math.cos(angle) + userPos.x;
-        const y = centerY + radius * Math.sin(angle) + userPos.y;
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
         nodePoints.push([x,y]);
     }
-    addNodes(nodePoints);
-
     // Add edges: For a complete graph, connect every pair of nodes
     const edges = [];
     for (let i = 1; i <= n; i++) {
         for (let j = i + 1; j <= n; j++) {
-            var fromId = String(i+nodeStart);
-            var toId = String(j+nodeStart);
-            edges.push([fromId, toId]);
+            edges.push([i,j]);
         }
     }
-    addEdges(edges);
+
+    makeGraph(nodePoints, edges);
 }
 
-function makeCubeGraph() {
-    // Define node positions to look like a cube in 2D:
-    // We'll have a "front" square and a "back" square offset to give a sense of depth.
-    // Front square (4 vertices):
+function makeCube(size=100) {
     const frontSquare = [
-        { id: String(1),  x: -100, y: -100 },
-        { id: String(2),  x: 100,  y: -100 },
-        { id: String(3),  x: 100,  y: 100 },
-        { id: String(4),  x: -100, y: 100 }
-    ];
-
-    // Back square (4 vertices) slightly shifted:
-    const backSquare = [
-        { id: String(5),  x: -50,  y: -50 },
-        { id: String(6),  x: 150,  y: -50 },
-        { id: String(7),  x: 150,  y: 150 },
-        { id: String(8),  x: -50,  y: 150 }
-    ];
-
-    // Add all nodes
-    var userPos = NetworkState.network.getViewPosition();
-    var nodeStart = NetworkState.node_id;
-    if (NetworkState.node_id == 0) nodeStart -= 1;
-    const allNodes = frontSquare.concat(backSquare);
-
-    const nodePoints = [];
-    for (let node of allNodes) {
-        nodePoints.push([node.x+userPos.x, node.y+userPos.y]);
-        NetworkState.node_count += 1;
-    }
-    addNodes(nodePoints);
-
-    // Edges of a cube:
-    // Front square edges: (1–2, 2–3, 3–4, 4–1)
-    // Back square edges:  (5–6, 6–7, 7–8, 8–5)
-    // Connect front to back: (1–5, 2–6, 3–7, 4–8)
+        [-size,-size],
+        [size,-size],
+        [size,size],
+        [-size,size]
+    ]
+    const backSquare = frontSquare.map(pos => [pos[0]-size/2, pos[1]-size/2]);
     const edges = [
-        // Front square
         [1,2], [2,3], [3,4], [4,1],
-        // Back square
         [5,6], [6,7], [7,8], [8,5],
-        // Connections between front and back
         [1,5], [2,6], [3,7], [4,8]
     ];
+    return {nodes: frontSquare.concat(backSquare), edges: edges};
+}
 
-    const edgePoints = [];
-    for (let edge of edges) {
-        var fromId = String(edge[0]+nodeStart);
-        var toId = String(edge[1]+nodeStart);
-        edgePoints.push([fromId,toId]);
-    }
-    addEdges(edgePoints);
+function makeCubeGraph(event) {
+    const size = 100;
+    const cube = makeCube(size);
+    makeGraph(cube.nodes, cube.edges);
 }
 
 function makeHyperCube() {
-    // Outer cube vertices (like a cube):
-    // Two squares offset, connected to form a cube shape.
-    const outerCube = [
-        {id: String(1), x: -150, y: -150},
-        {id: String(2), x: 150,  y: -150},
-        {id: String(3), x: 150,  y: 150},
-        {id: String(4), x: -150, y: 150},
-        {id: String(5), x: -100, y: -100},
-        {id: String(6), x: 200,  y: -100},
-        {id: String(7), x: 200,  y: 200},
-        {id: String(8), x: -100, y: 200}
+    const size = 100;
+    const outerCube = makeCube(size * 1.5);
+    const innerCube = makeCube(size * 0.5);
+    const extraEdges = [
+        [1,9],
+        [2,10],
+        [3,11],
+        [4,12],
+        [5,13],
+        [6,14],
+        [7,15],
+        [8,16]
     ];
-
-    // Inner cube vertices (smaller cube inside):
-    const innerCube = [
-        {id: String(9),  x: -50, y: -50},
-        {id: String(10), x: 50,  y: -50},
-        {id: String(11), x: 50,  y: 50},
-        {id: String(12), x: -50, y: 50},
-        {id: String(13), x: -25, y: -25},
-        {id: String(14), x: 75,  y: -25},
-        {id: String(15), x: 75,  y: 75},
-        {id: String(16), x: -25, y: 75}
-    ];
-
-    const outerEdges = [
-        [1,2], [2,3], [3,4], [4,1],
-        [5,6], [6,7], [7,8], [8,5],
-        [1,5], [2,6], [3,7], [4,8]
-    ];
-
-    const innerEdges = [
-        [9,10], [10,11], [11,12], [12,9],
-        [13,14], [14,15], [15,16], [16,13],
-        [9,13], [10,14], [11,15], [12,16]
-    ];
-
-    const hyperEdges = [
-        [1,9], [2,10], [3,11], [4,12],
-        [5,13], [6,14], [7,15], [8,16]
-    ];
-
-    var userPos = NetworkState.network.getViewPosition();
-    var nodeStart = NetworkState.node_id;
-    if (NetworkState.node_id == 0) nodeStart -= 1;
-
-    const allNodes = outerCube.concat(innerCube);
-    const nodePoints = allNodes.map(p => [p.x+userPos.x, p.y+userPos.y]);
-    addNodes(nodePoints);
-
-    const allEdges = outerEdges.concat(innerEdges).concat(hyperEdges);
-    const edgePoints = allEdges.map(edge => [
-        String(edge[0]+nodeStart),
-        String(edge[1]+nodeStart)
-    ]);
-    addEdges(edgePoints);
+    const nodes = outerCube.nodes.concat(innerCube.nodes);
+    const edges = outerCube.edges.concat(
+        innerCube.edges.map(e => [e[0]+8, e[1]+8])
+    ).concat(extraEdges);
+    makeGraph(nodes, edges);
 }
 
 function makeCartesianProduct() {
