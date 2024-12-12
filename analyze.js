@@ -13,6 +13,10 @@ function getOpenTab() {
 function updateGraphInfo() {
     NetworkState.components = getComponents();
     NetworkState.bipartite = isGraphBipartite(); // must come after getComponents();
+    if (NetworkState.bridgesVisible) {
+        NetworkState.bridges = getBridges();
+        drawBridges();
+    }
 
     switch (getOpenTab()) {
         case "node-degrees-tab":
@@ -21,16 +25,6 @@ function updateGraphInfo() {
             createAdjacencyMatrix(); break;
     }
 
-    NetworkState.edges.update( // reset the edge colors back to normal (to reset dijkstra coloring)
-        NetworkState.edges.get().map(edge => {
-            return {
-                id: edge.id, 
-                color: NetworkState.options.edges.color, 
-                width: 1 
-            };
-        })
-    );
-    document.getElementById('toggle-bridges-btn').classList.remove('custom-active');
     document.getElementById('node-count').textContent = NetworkState.node_count;
     document.getElementById('edge-count').textContent = NetworkState.edge_count;
     document.getElementById("component-count").textContent = NetworkState.components.length;
@@ -268,6 +262,7 @@ function toggleComponents() {
 
 function djikstra() {
     updateGraphInfo()
+    if (NetworkState.bridgesVisible) toggleBridges();
 
     // Check if NetworkState.nodes exist and they are in the same component:
     // =============================================================================================
@@ -381,58 +376,103 @@ function djikstra() {
             };
         })
     );
-
     // alert(`Shortest path found! The path is: ${path.map(p => `${p.from} -> ${p.to}`).join(", ")}`);
     // =============================================================================================
 }
 
-function getBridges() {
-    var bridges = [];
-    for (var e of NetworkState.edges.get()) {
-        var startNumComponents = NetworkState.components.length;
-        NetworkState.edges.remove(e);
-        var endNumComponents = NetworkState.components.length;
-        NetworkState.edges.add(e);
-        if (startNumComponents != endNumComponents) 
-            bridges.push(e);
+function getAdjacencyList() {
+    const nodeMap = new Map();
+    const nodeMapInv = new Map();
+    NetworkState.nodes.get().forEach((node, index) => {
+        nodeMap[node.id] = index;
+        nodeMapInv[index] = node.id;
+    });
+    const adjacencyList = NetworkState.nodes.get().reduce((acc, obj, _) => {
+        acc.push(NetworkState.network.getConnectedNodes(obj.id).map(n => nodeMap[n]));
+        return acc;
+    }, []);
+    function edgeToVis(from, to) {
+        return NetworkState.edges.get({
+            filter: (edge) => 
+                (edge.from === nodeMapInv[from] && edge.to === nodeMapInv[to]) ||
+                (edge.to === nodeMapInv[from] && edge.from === nodeMapInv[to])
+        });
     }
-    return bridges;
+    return {adjacencyList: adjacencyList, edgeToVis: edgeToVis};
+}
+
+function getBridges() {
+    const { adjacencyList, edgeToVis } = getAdjacencyList();
+    const n = adjacencyList.length;
+    const visited = Array(n).fill(false);
+    const disc = Array(n).fill(-1);
+    const low = Array(n).fill(-1);
+    var parent = Array(n).fill(-1);
+    const bridges = [];
+    var time = 0;
+
+    function dfs(u) {
+        visited[u] = true;
+        disc[u] = time;
+        low[u] = time;
+        time += 1;
+        for (var v of adjacencyList[u]) {
+            if (v == parent[u]) 
+                continue;
+            else if (visited[v]) 
+                low[u] = Math.min(low[u],disc[v]);
+            else {
+                parent[v] = u;
+                dfs(v);
+                low[u] = Math.min(low[u],low[v]);
+                if (low[v] > disc[u]) {
+                    bridges.push([u,v]);
+                }
+            }
+        }
+    }
+
+    for (var u = 0; u < n; u++) {
+        if (visited[u] == false) {
+            dfs(u);        
+        }
+    }
+
+    const visEdges = bridges
+        .map(b => edgeToVis(b[0], b[1])) // map adjacency edges to vis.js edges
+        .filter(bs => bs.length == 1) // remove parallel edges
+        .map(bs => bs[0].id) // convert [edge] into edge.id
+    return visEdges;
+}
+
+function colorEdges(edgeIds, color, width=1) {
+    NetworkState.edges.update(
+        NetworkState.edges.get().map(e => {
+            const included = edgeIds.includes(e.id);
+            return {
+                id: e.id,
+                color: (included) ? color : NetworkState.options.edges.color,
+                width: (included) ? width : 1
+            }
+        })
+    );
+}
+
+function drawBridges() {
+    colorEdges(NetworkState.bridges, "red", 3);
 }
 
 function toggleBridges() {
-    updateGraphInfo()
-    var bridgeColor = "red";
-    var nonBridgeColor = NetworkState.options.edges.color;
-
-    var bridges;
-    if (NetworkState.bridgesVisible) {
-        bridges = [];
-        NetworkState.bridgesVisible = false; 
-    }
-    else {
-        var bridges = getBridges();
-        NetworkState.bridgesVisible = true;
-    }
-    var nonBridges = NetworkState.edges.get().filter(e => !bridges.includes(e));
-    NetworkState.bridgesVisible ? document.getElementById('toggle-bridges-btn').classList.add('custom-active') : document.getElementById('toggle-bridges-btn').classList.remove('custom-active');
-
-    for (var b of bridges) {
-        NetworkState.edges.update({
-            id: b.id,
-            color: bridgeColor,
-            highlight: bridgeColor,
-            hover: bridgeColor
-        });
-    }
-    for (var e of nonBridges) {
-        NetworkState.edges.update({
-            id: e.id,
-            color: nonBridgeColor,
-            highlight: nonBridgeColor,
-            hover: nonBridgeColor
-        });
-    }
+    const toggleBridgesBtn = document.getElementById('toggle-bridges-btn');
+    NetworkState.bridgesVisible = !NetworkState.bridgesVisible;
+    NetworkState.bridgesVisible ? 
+        toggleBridgesBtn.classList.add('custom-active') : 
+        toggleBridgesBtn.classList.remove('custom-active');
+    if (!NetworkState.bridgesVisible)
+        colorEdges(NetworkState.bridges, NetworkState.options.edges.color, 1);
+    updateGraphInfo();
 }
+
 
 function getDirectedNeighbors(nodeId, direction) {
     const connectedEdges = NetworkState.network.getConnectedEdges(nodeId); 
